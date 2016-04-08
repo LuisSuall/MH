@@ -1,0 +1,19 @@
+Codigo:
+Contiene el código de las prácticas. Contiene:
+
+-main.py: Main para ejecutar la práctica.
+    
+    Ejecutar con python3 main.py <BD> <Heu> ¿<seed>?
+        BD: base de datos (wdbc, libras, arrhythmia)
+        Heu: Heurística (SFS,LS,SA,TS)
+        seed: opcional. Si no se introduce ninguna,
+             se ejecuta con las usadas en la práctica
+
+-classifier.py: Implementa el 3NN
+-data_handler.py: Implementa la carga y modificación de los datos
+-heuristic.py: Implementa las heurísticas
+-main_ejecuciones.py: main usado al ejecutar los resultados (obsoleto)
+-mask.py: Implementa una solución
+
+Datos:
+Contiene las bases de datos usadas en la práctica
