@@ -7,22 +7,19 @@ import numpy as np
 class Heuristic:
 
 	def __init__(self,classifier = None):
-		self.__classifier = classifier
+		self.classifier = classifier
 
 	def set_classifier(self,classifier):
-		self.__classifier = classifier
+		self.classifier = classifier
 
 	def run(self,mask, max_iter):
 		pass
 
 
-class GreedyHeuristic:
+class GreedyHeuristic(Heuristic):
 
 	def __init__(self,classifier):
-		self.__classifier = classifier
-
-	def set_classifier(self,classifier):
-		self.__classifier = classifier
+		super().__init__(classifier)
 
 	def run(self, mask, max_iter):
 		best_idx = -1
@@ -33,7 +30,7 @@ class GreedyHeuristic:
 			change_produced = False
 			for idx in range(0,mask.length()):
 				if not mask.get(idx):
-					score = self.__classifier.score_train(mask, idx)
+					score = self.classifier.score_train(mask, idx)
 					if  score > best_score:
 						best_score = score
 						best_idx = idx
@@ -47,24 +44,21 @@ class GreedyHeuristic:
 
 
 
-class LSHeuristic:
+class LSHeuristic(Heuristic):
 
 	def __init__(self,classifier):
-		self.__classifier = classifier
-
-	def set_classifier(self,classifier):
-		self.__classifier = classifier
+		super().__init__(classifier)
 
 	def run(self, mask, max_iter):
 		num_sol = 0
-		best_score = self.__classifier.score_train(mask)
+		best_score = self.classifier.score_train(mask)
 		changed = True
 
 		while changed and num_sol < max_iter:
 			changed = False
 
 			for idx in random.sample(range(mask.length()),mask.length()):
-				score = self.__classifier.score_train(mask, idx)
+				score = self.classifier.score_train(mask, idx)
 				num_sol += 1
 				if  score > best_score:
 					best_score = score
@@ -74,17 +68,14 @@ class LSHeuristic:
 
 		return best_score
 
-class SAHeuristic:
+class SAHeuristic(Heuristic):
 
 	def __init__(self,classifier):
-		self.__classifier = classifier
-
-	def set_classifier(self,classifier):
-		self.__classifier = classifier
+		super().__init__(classifier)
 
 	def run(self, mask, max_iter):
 		num_sol = 0
-		best_score = self.__classifier.score_train(mask)
+		best_score = self.classifier.score_train(mask)
 		best_mask = Mask(mask.length())
 		best_mask.values = np.copy(mask.values)
 		mu = 0.3
@@ -106,7 +97,7 @@ class SAHeuristic:
 					break
 
 				idx = random.randint(0,data_length-1)
-				score = self.__classifier.score_train(mask,idx)
+				score = self.classifier.score_train(mask,idx)
 				num_sol += 1
 
 				if score > best_score:
@@ -131,17 +122,14 @@ class SAHeuristic:
 		return best_score
 
 
-class TABUHeuristic:
+class TABUHeuristic(Heuristic):
 
 	def __init__(self,classifier):
-		self.__classifier = classifier
+		super().__init__(classifier)
 
-	def set_classifier(self,classifier):
-		self.__classifier = classifier
-		
 	def run(self, mask, max_iter):
 		num_sol = 0
-		best_score = self.__classifier.score_train(mask)
+		best_score = self.classifier.score_train(mask)
 		best_mask = Mask(mask.length())
 		best_mask.values = np.copy(mask.values)
 
@@ -155,7 +143,7 @@ class TABUHeuristic:
 			best_neighbourhood_score = 0
 
 			for idx in random.sample(range(mask.length()),30):
-				score = self.__classifier.score_train(mask,idx)
+				score = self.classifier.score_train(mask,idx)
 				num_sol += 1
 
 				if score > best_score:		#Criterio de aspiracion
@@ -179,3 +167,33 @@ class TABUHeuristic:
 
 		mask.values = np.copy(best_mask.values)
 		return best_score
+
+class BMBHeuristic(Heuristic):
+
+	def __init__(self,classifier):
+		super().__init__(classifier)
+
+	def run(mask):
+		LS = LSHeuristic(self.classifier)
+
+		best_score = 0
+		best_mask = Mask(mask.length())
+
+		for _ in range(25):
+			mask.randomize()
+			score = LS(mask)
+
+			if score > best_score:
+				best_score = score
+				best_mask.values = np.copy(mask.values)
+
+		mask.values = np.copy(best_mask.values)
+		return best_score
+
+class GRASPHeuristic(Heuristic):
+
+	def __init__(self,classifier):
+		super().__init__(classifier)
+
+	def run(mask):
+		pass

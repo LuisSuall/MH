@@ -1,5 +1,7 @@
 import numpy as np
 from sklearn import neighbors,cross_validation
+from multiprocessing import Pool
+from functools import partial
 
 class Classifier:
 
@@ -9,6 +11,34 @@ class Classifier:
 		self.__test_data = test_data
 		self.__test_label = test_label
 		self.__knn = neighbors.KNeighborsClassifier(3, weights = 'distance')
+
+	def single_loo_score(self,X,y,list_index):
+		X_train, X_test = X[list_index[0]], X[list_index[1]]
+		y_train, y_test = y[list_index[0]], y[list_index[1]]
+		self.__knn.fit(X_train, y_train)
+		return self.__knn.score(X_test,y_test)
+
+	def new_score(self, mask, workers, i = None):
+
+		if i != None:
+			mask.flip(i)
+
+		X = self.__train_data[:,mask.values]
+		y = self.__train_label
+		loo = cross_validation.LeaveOneOut(len(y))
+		l_loo = list(loo)
+		#Parallelized using Pool
+		fragmented_score = partial(self.single_loo_score, X,y)
+		p = Pool(workers)
+		scores = p.map(fragmented_score,l_loo)
+		p.close()
+		p.join()
+
+
+		if i != None:
+			mask.flip(i)
+
+		return 100*sum(scores) / len(scores)
 
 	def score_train(self, mask, i = None):
 

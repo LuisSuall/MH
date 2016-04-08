@@ -44,6 +44,26 @@ def main():
 			my_mask = mask.Mask(len(train_data[0]))
 			my_mask.randomize()
 
+			t_start = time.time()
+			for _ in range(100):
+				score = my_classifier.new_score(my_mask,2)
+			t_end = time.time()
+			print("Score: " +  str(score))
+			print("Tiempo: " + str(t_end - t_start))
+			t_start = time.time()
+			for _ in range(100):
+				score = my_classifier.new_score(my_mask,4)
+			t_end = time.time()
+			print("Score: " +  str(score))
+			print("Tiempo: " + str(t_end - t_start))
+			t_start = time.time()
+			for _ in range(100):
+				score = my_classifier.score_train(my_mask)
+			t_end = time.time()
+			print("Score: " +  str(score))
+			print("Tiempo: " + str(t_end - t_start))
+			print(my_classifier.score_train(my_mask))
+
 			my_heuristic.set_classifier(my_classifier)
 
 			start_time = time.time()
