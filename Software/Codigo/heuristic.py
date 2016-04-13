@@ -146,7 +146,7 @@ class TABUHeuristic(Heuristic):
 				score = self.classifier.score_train(mask,idx)
 				num_sol += 1
 
-				if score > best_score:		#Criterio de aspiracion
+				if score > best_score:
 					best_score = score
 					best_mask.values = np.copy(mask.values)
 					best_mask.flip(idx)
@@ -181,7 +181,7 @@ class BMBHeuristic(Heuristic):
 
 		for _ in range(25):
 			mask.randomize()
-			score = LS(mask)
+			score = LS.run(mask)
 
 			if score > best_score:
 				best_score = score
@@ -190,10 +190,85 @@ class BMBHeuristic(Heuristic):
 		mask.values = np.copy(best_mask.values)
 		return best_score
 
+class ASFSHeuristic(Heuristic):
+	def __init__(self,classifier):
+		super().__init__(classifier)
+
+	def run(mask, tolerance = 0.3):
+		best_score = 0
+		change_produced = True
+
+		while(change_produced):
+			neighbourhood_best_score = 0
+			neighbourhood_worst_score = 100
+			change_produced = False
+			saved_scores = np.full((mask.length(),2),-100,dtype = float64)
+
+			for idx in range(0,mask.length()):
+				if not mask.get(idx):
+					score = self.classifier.score_train(mask, idx)
+					saved_scores[idx] = [idx,score]
+					if  score > best_score:
+						neighbourhood_best_score = score
+					elif score < worst_score:
+						neighbourhood_worst_score = score
+
+			min_accepted = best_score - tolerance * (best_score - worst_score)
+			saved_scores = saved_scores[saved_scores[:,1]>min_accepted]
+			selected_neighbour = saved_scores[random.randint(0,len(saved_scores))]
+
+			if selected_neighbour[1] > best_score:
+				change_produced = True
+				best_score = selected_neighbour[1]
+				mask.flip(selected_neighbour[0])
+
+		return best_score
+
 class GRASPHeuristic(Heuristic):
 
 	def __init__(self,classifier):
 		super().__init__(classifier)
 
 	def run(mask):
-		pass
+		LS = LSHeuristic(self.classifier)
+		ASFS = ASFSHeuristic(self.classifier)
+
+		best_score = 0
+		best_mask = Mask(mask.lenght)
+
+		for _ in range(25):
+			mask.set_false()
+			ASFS.run(mask)
+			score = LS.run(mask)
+
+			if score > best_score:
+				best_score = score
+				best_mask.values = np.copy(mask.values)
+
+		mask.values = np.copy(best_mask.values)
+		return best_score
+
+class ILSHeuristic(Heuristic):
+
+	def __init__(self,classifier):
+		super().__init__(classifier)
+
+	def run(mask):
+		LS = LSHeuristic(self.classifier)
+
+		best_score = LS.run(mask)
+		best_mask = Mask(mask.lenght)
+		best_mask.values = np.copy(mask.values)
+
+		for _ in range(25):
+			mask.mutate()
+			score = LS.run(mask)
+
+			if score > best_score:
+				best_score = score
+				best_mask.values = np.copy(mask.values)
+			else:
+				mask.values = np.copy(best_mask.values)
+
+		mask.values = np.copy(best_mask.values)
+		return best_score
