@@ -4,6 +4,7 @@ import numpy as np
 import random
 import csv
 import sys
+from knnGPU.knnLooGPU import knnLooGPU
 
 def main():
 	if len(sys.argv) > 2:
@@ -40,29 +41,41 @@ def main():
 			random.seed(seed)
 			train_data, train_label, test_data, test_label = data_hand.split()
 
-			my_classifier = classifier.Classifier(train_data, train_label, test_data, test_label)
-			my_mask = mask.Mask(len(train_data[0]))
-			my_mask.randomize()
+			#my_classifier = classifier.Classifier(train_data, train_label, test_data, test_label)
+			my_mask = mask.Mask(train_data.shape[1])
+			my_mask.values = np.ones(train_data.shape[1],dtype = np.bool)
+
+			cuda_knn = knnLooGPU(train_data, train_label, 3)
+			ulta_pro_mask = np.array(range(70),dtype = np.int32)
+
+
+			print("Valor de la máscara")
+			print(my_mask.values)
+			print("SUMA:")
+			print(my_mask.values.sum())
 
 			t_start = time.time()
 			for _ in range(100):
-				score = my_classifier.new_score(my_mask,2)
+				score = cuda_knn.scoreSolution(ulta_pro_mask)
 			t_end = time.time()
+			print("Er cuda del Montoro to reshu sin mi clase intermedia")
 			print("Score: " +  str(score))
 			print("Tiempo: " + str(t_end - t_start))
+
 			t_start = time.time()
 			for _ in range(100):
-				score = my_classifier.new_score(my_mask,4)
+				score = my_classifier.cuda_score(my_mask)
 			t_end = time.time()
+			print("Er cuda del Montoro to reshu con mi clase intermedia")
 			print("Score: " +  str(score))
 			print("Tiempo: " + str(t_end - t_start))
+
 			t_start = time.time()
 			for _ in range(100):
 				score = my_classifier.score_train(my_mask)
 			t_end = time.time()
 			print("Score: " +  str(score))
 			print("Tiempo: " + str(t_end - t_start))
-			print(my_classifier.score_train(my_mask))
 
 			my_heuristic.set_classifier(my_classifier)
 
