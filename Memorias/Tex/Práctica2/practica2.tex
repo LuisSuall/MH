@@ -1,0 +1,248 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% University Assignment Title Page 
+% LaTeX Template
+% Version 1.0 (27/12/12)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original author:
+% WikiBooks (http://en.wikibooks.org/wiki/LaTeX/Title_Creation)
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+% 
+% Instructions for using this template:
+% This title page is capable of being compiled as is. This is not useful for 
+% including it in another document. To do this, you have two options: 
+%
+% 1) Copy/paste everything between \begin{document} and \end{document} 
+% starting at \begin{titlepage} and paste this into another LaTeX file where you 
+% want your title page.
+% OR
+% 2) Remove everything outside the \begin{titlepage} and \end{titlepage} and 
+% move this file to the same directory as the LaTeX file you wish to add it to. 
+% Then add \input{./title_page_1.tex} to your LaTeX file where you want your
+% title page.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[12pt,spanish]{article}
+\usepackage[spanish]{babel}
+\selectlanguage{spanish}
+\usepackage[utf8]{inputenc}
+\usepackage{makeidx}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\begin{document}
+
+\begin{titlepage}
+
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}} % Defines a new command for the horizontal lines, change thickness here
+
+\center % Center everything on the page
+ 
+%----------------------------------------------------------------------------------------
+%	HEADING SECTIONS
+%----------------------------------------------------------------------------------------
+
+\textsc{\LARGE Práctica 1.b}\\[1.0cm] % Name of your university/college
+\textsc{\Large Búsqueda por Trayectorias}\\[0.5cm] % Major heading such as course name
+\textsc{\large Selección de características}\\[0.5cm] % Minor heading such as course title
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\HRule \\[0.4cm]
+{Algoritmos considerados: BMB,Grasp,SA,ILS}\\[0.4cm] % Title of your document
+
+ 
+%----------------------------------------------------------------------------------------
+%	AUTHOR SECTION
+%----------------------------------------------------------------------------------------
+
+\begin{minipage}{1\textwidth}
+\begin{flushleft} \large
+Luis Suárez Lloréns\\
+DNI: 75570369-M\\
+luissuarez@correo.ugr.es\\
+5º Doble Grado Ingeniería Informática y Matemáticas\\
+Grupo de Prácticas: 3
+\end{flushleft}
+\end{minipage}
+
+% If you don't want a supervisor, uncomment the two lines below and remove the section above
+%\Large \emph{Author:}\\
+%John \textsc{Smith}\\[3cm] % Your name
+
+%----------------------------------------------------------------------------------------
+%	DATE SECTION
+%----------------------------------------------------------------------------------------
+
+%----------------------------------------------------------------------------------------
+%	LOGO SECTION
+%----------------------------------------------------------------------------------------
+
+%\includegraphics{Logo}\\[1cm] % Include a department/university logo - this will require the graphicx package
+ 
+%----------------------------------------------------------------------------------------
+
+\vfill % Fill the rest of the page with whitespace
+
+\end{titlepage}
+\tableofcontents
+\newpage
+\section{Descripción del problema}
+Cuando se trata un problema de clasificación o de aprendizaje automático, nunca sabemos a priori los datos que nos serán útiles. Es más, añadir datos innecesarios puede incluso empeorar el rendimiento de nuestro clasificador.\\
+ 
+ El fin del problema de selección de características es tratar de tomar un conjunto de datos de calidad, que nos permita afrontar el posterior aprendizaje de una manera más rápida y con menos ruido en los datos.\\
+ 
+Pese a no ser este un problema directamente de clasificación, vamos a necesitarla para valorar la calidad de una solución del problema. Por tanto, necesitamos un clasificador sencillo para esta tarea. Utilizaremos el clasificador k-nn --- para ser más concreto, 3-nn ---, y trataremos de encontrar las características con las que mejor clasifique un conjunto de prueba.\\
+
+Entonces, usando el clasificador 3-nn, nuestro objetivo va a ser maximizar la función:\\
+ 
+ \[
+ \	\frac{Instancias\, bien\, clasificadas}{Total\, de\, instancias}
+ \]
+ 
+ 
+\newpage
+\section{Consideraciones generales}
+En esta sección veremos los componentes en común de los diferentes algoritmos.
+\begin{itemize}
+\item \textbf{Representación:} Array binario con la misma longitud que el número de datos.
+\item \textbf{Función objetivo:} Porcentaje de acierto del clasificador 3-nn. Para evaluarlo Tendríamos que hacer lo siguiente:
+\begin{itemize}
+\item Tomar las columnas que nos indique la solución.
+\item Entrenar el clasificador con los datos de entrenamiento y sus etiquetas.
+\item Clasificar los datos de test y comprobar si coinciden con sus verdaderas etiquetas.
+\end{itemize} 
+Además, para poder ver lo bien que clasifica al propio conjunto de entrenamiento, realizamos "Leave One Out", que consiste en, para cada dato del conjunto de entrenamiento, quitarlo de los datos de entrenamiento, clasificarlo y ver si hemos acertado al clasificar o no.
+\item \textbf{Generación de vecindario:} El vecindario serán las soluciones que solo difieran de la actual un bit. La generación del vecino i-ésimo podría realizarse de la siguiente forma: Si el valor en la posición i es verdadero, ponerlo a falso.Si no, ponerlo a verdadero. 
+\item Uno de los parámetros de los algoritmos a la hora de ejecutarlos es la solución inicial. Esto nos permitirá utilizar estos mismos métodos para la realización de búsqueda multiarranque, por ejemplo. Por tanto, el calculo de una solución de inicio aleatoria se encuentra fuera de los algoritmos.
+\item \textbf{Generación de soluciones aleatorias:} Se guardan en la máscara los resultados de muestrear una binomial que nos devuelve valores verdadero y falso con la misma probabilidad.
+\end{itemize}
+\subsection{BL}
+Para generar de manera aleatoria los vecinos de una solución dada, realizamos lo siguiente:
+\begin{itemize}
+\item Crear una lista de números de 0 al número de características del problema
+\item Reordenar aleatoriamente dicha lista
+\end{itemize} 
+La lista reordenada después se recorre, y modificando el elemento indicado de la solución de partida, obtenemos los vecinos.\\
+
+Búsqueda local:
+\begin{itemize}
+\item Hasta que no encontremos mejora en el bucle interno o superemos el número máximo de iteraciones, repetir:
+\item Para cada vecino, ordenados aleatoriamente ---bucle interno---
+\begin{itemize}
+\item Calcular la función objetivo.
+\item Si mejora la función objetivo de la solución actual, pasa a ser la solución actual y termina el búcle interno.
+\end{itemize} 
+\end{itemize} 
+\newpage
+\newpage
+\section{Explicación de los algoritmos}
+
+\subsection{BMB}
+\textbf{Búsqueda multiarranque básico}
+\begin{itemize}
+\item Realizar 25 veces:
+\begin{itemize}
+\item Calcular solución aleatoria.
+\item Realizar búsqueda local a la solución.
+\item Si es mejor que la mejor solución hasta el momento, guardarla como nueva mejor solución
+\end{itemize} 
+\item Devuelve la mejor solución encontrada y el valor de su función objetivo.
+\end{itemize} 
+\newpage
+\subsection{GRASP}
+\textbf{ASFS:}
+\begin{itemize}
+\item La solución empieza completamente a falso.
+\item Mientras que encontremos mejora:
+\begin{itemize}
+\item Creamos un vector para guardar los valores de la función objetivo
+\item Inicializamos valores para guardar los máximos y mínimos encontrados.
+\item Para cada característica, si no es verdadera:
+\begin{itemize}
+\item Guardar su valor de función objetivo y posición.
+\item Actualizar el mejor y peor valor de la función objetivo si fuera necesario.
+\end{itemize}
+\item Calculamos el mínimo aceptado como $M-t(M-m)$, siendo M el máximo valor de la función objetivo, m el mínimo y t la tolerancia admitida.
+\item Tomamos los vecinos que superen el mínimo y elegimos uno aleatoriamente.
+\item Si el vecino supera a la solución anterior, se toma como siguiente solución y se marca que se ha realizado mejora.
+\end{itemize}
+\item Devuelve la solución encontrada.
+\end{itemize}
+
+\textbf{GRASP:}
+\begin{itemize}
+\item Realizar 25 veces:
+\begin{itemize}
+\item Calcular solución inicial con ASFS.
+\item Realizar búsqueda local a la solución.
+\item Si es mejor que la mejor solución hasta el momento, guardarla como nueva mejor solución
+\end{itemize} 
+\item Devuelve la mejor solución encontrada y el valor de su función objetivo.
+\end{itemize} 
+\newpage
+\subsection{ILS}
+\textbf{Función de mutación:}
+\begin{itemize}
+\item Tomamos $s$ elementos sin remplazamiento de los números enteros desde el 0 hasta el número de características del problema, sin contar este último.  
+\item Modificamos los valores seleccionados en la solución.
+\end{itemize} 
+
+\textbf{Iterated Local Search:}
+\begin{itemize}
+\item Realizamos la búsqueda local sobre la solución inicial.
+\item Guardamos el resultado como mejor función objetivo encontrada y mejor solución encontrada.
+\item Realizamos 24 veces:
+\begin{itemize}
+\item Muta la solución.
+\item Realiza una búsqueda local sobre la solución mutada.
+\item Si la solución encontrada por la búsqueda local mejora la mejor hasta el momento, la sustituye.
+\end{itemize} 
+\item Devuelve la mejor solución encontrada y el valor de su función objetivo.
+\end{itemize} 
+
+\newpage
+\section{Algoritmo de comparación}
+El algoritmo de comparación es el algoritmo greedy SFS, que consiste en:
+\begin{itemize}
+\item Partimos de la solución completamente a 0.
+\item Hasta que no encontremos mejora, realizar:
+\begin{itemize}
+\item Para cada bit que sea 0, ponerlo a uno y calcular la función objetivo.
+\item Tomamos la mejor de todas, y si mejora a la solución que teníamos, hacemos permanente el cambio y seguimos iterando.
+\end{itemize} 
+\end{itemize} 
+\newpage
+\section{Procedimiento}
+Para la realización de las prácticas, he usado el lenguaje Python 3 y varios paquetes adicionales.\\
+
+Usamos scikit para la creación de particiones y para normalizar los datos.\\
+
+Para el uso del clasificador 3-nn, tanto para el cálculo del acierto del test  como para Leave One Out, utilizamos una implementación en CUDA realizada por Alejandro García Montoro, pues la mejora de tiempo es sustancial con respecto al k-nn implementado en scikit, que sólo usa la CPU del ordenador.\\
+
+Para la realización de los algoritmos, se utilizó Python 3 de manera directa, basandose en los códigos de la asignatura. Con el fin de poder empezar la ejecución del programa desde una partición intermedia, cada partición tiene una seed asociada en vez de usarse una única seed para todo el fichero. Las seeds son, por orden: $12345678,90123456,78901234,456789012,34567890$. \\
+
+Para usar el programa, hay que ejecutar la orden  python3 main.py BaseDatos Heurística Semilla. Si no se introduce semilla, se utilizan las usadas para obtener los resultados.
+\newpage
+\section{Resultados}
+
+\newpage
+\section{Referencias}
+Aparte de la documentación de la asignatura, he usado las páginas de referencia del software usado para desarrollar las prácticas:
+\begin{itemize}
+\item Python:  \url{https://docs.python.org/3/}
+\item Numpy y Scipy: \url{http://docs.scipy.org/doc/}
+\item Scikit-learn: \url{http://scikit-learn.org/stable/documentation.html}
+\item K-nn CUDA: \url{https://github.com/agarciamontoro/metaheuristics}
+\end{itemize}
+\end{document}

@@ -12,11 +12,17 @@ class Mask:
 	def get(self,i):
 		return self.values[i]
 
+	def length(self):
+		return len(self.values)
+
 	def flip(self,i):
 		if self.values[i]:
 			self.values[i] = False
 		else:
 			self.values[i] = True
 
-	def length(self):
-		return len(self.values)
+	def mutate(self,s):
+		mutate_idx = np.random.choice(range(self.lenght()),s,replace=False)
+
+		for idx in mutate_idx:
+			self.flip(idx)

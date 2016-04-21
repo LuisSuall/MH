@@ -255,13 +255,14 @@ class ILSHeuristic(Heuristic):
 
 	def run(mask):
 		LS = LSHeuristic(self.classifier)
+		s = round(mask.lenght*0.1)
 
 		best_score = LS.run(mask)
 		best_mask = Mask(mask.lenght)
 		best_mask.values = np.copy(mask.values)
 
-		for _ in range(25):
-			mask.mutate()
+		for _ in range(24):
+			mask.mutate(s)
 			score = LS.run(mask)
 
 			if score > best_score:
