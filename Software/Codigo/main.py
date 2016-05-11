@@ -37,7 +37,7 @@ def main():
 		elif sys.argv[2] == "AGG":
 			my_heuristic = heuristic.AGGHeuristic(None)
 		elif sys.argv[2] == "AGE":
-			my_heuristic = heuristic.AGGHeuristic(None)
+			my_heuristic = heuristic.AGEHeuristic(None)
 		else:
 			print("Opcion de heuristica incorrecta")
 			return
@@ -60,7 +60,7 @@ def main():
 			my_heuristic.set_classifier(my_classifier)
 
 			start_time = time.time()
-			score = my_heuristic.run(my_mask,5000)
+			score = my_heuristic.run(my_mask,15000)
 			end_time = time.time()
 
 			reduction = 0
@@ -95,7 +95,7 @@ def main():
 			my_heuristic.set_classifier(my_classifier)
 
 			start_time = time.time()
-			score = my_heuristic.run(my_mask,5000)
+			score = my_heuristic.run(my_mask,15000)
 			end_time = time.time()
 
 			reduction = 0

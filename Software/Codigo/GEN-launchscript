@@ -1,0 +1,19 @@
+#! /bin/bash
+
+printf "wdbc AGE\n"
+python ./main.py wdbc AGE
+
+printf "libra AGE\n"
+python ./main.py libras AGE
+
+printf "arrhythmia AGE\n"
+python ./main.py arrhythmia AGE
+
+printf "wdbc AGG\n"
+python ./main.py wdbc AGG
+
+printf "libra AGG\n"
+python ./main.py libras AGG
+
+printf "arrhythmia AGG\n"
+python ./main.py arrhythmia AGG

@@ -3,6 +3,7 @@ import random
 from math import log, exp
 from mask import Mask
 import numpy as np
+import math
 
 class Heuristic:
 
@@ -287,6 +288,26 @@ class GenericGeneticHeuristic(Heuristic):
 
 		return population
 
+	def select_parents(self,current_gen,num_parents):
+		mask_size = current_gen[0].length()
+		idx_parents = np.random.choice(range(len(current_gen)),
+									   num_parents*2,
+									   replace = True)
+		parents = []
+
+		for idx in range(num_parents):
+			parent_idx = -1
+			if current_gen[idx_parents[idx*2]].get_score() > current_gen[idx_parents[idx*2+1]].get_score():
+				parent_idx = idx_parents[idx*2]
+			else:
+				parent_idx = idx_parents[idx*2+1]
+
+			mask = Mask(mask_size)
+			mask.values = np.copy(current_gen[parent_idx].values)
+			parents.append(mask)
+
+		return parents
+
 	def cross_pair(self,first_parent, second_parent):
 		first_son = Mask(first_parent.length())
 		second_son = Mask(first_parent.length())
@@ -314,13 +335,19 @@ class GenericGeneticHeuristic(Heuristic):
 		num_gen = len(next_gen)
 		size_mask = next_gen[0].length()
 
-		num_mutations = 10
+		num_mutations = math.floor(num_gen*size_mask*prob_mutation)
+		if num_mutations == 0:
+			if random.uniform(0,1) < num_gen*size_mask*prob_mutation:
+				num_mutations = 1
 
-		for _ in range(num_mutations):
-			value_to_flip = random.randint(0,num_gen*size_mask-1)
-			next_gen[value_to_flip//size_mask].flip(value_to_flip%size_mask)
+		idx_mutation = np.random.choice(range(num_gen*size_mask),
+									   num_mutations,
+									   replace = True)
 
-	def run(self,mask,max_iter,select_parents,replace_gen,prob_cross,size_population=30,prob_mutation = 0.001):
+		for idx in idx_mutation:
+			next_gen[idx//size_mask].flip(idx%size_mask)
+
+	def run(self,mask,max_iter,num_parents,replace_gen,prob_cross,size_population=30,prob_mutation = 0.001):
 		current_gen = self.random_population(size_population,mask.length())
 		num_evals = 0
 
@@ -331,7 +358,7 @@ class GenericGeneticHeuristic(Heuristic):
 		current_gen = sorted(current_gen, key = lambda x:x.get_score(), reverse = True)
 
 		while num_evals < max_iter:
-			next_gen = select_parents(current_gen)
+			next_gen = self.select_parents(current_gen,num_parents)
 			self.cross(next_gen,prob_cross)
 			self.mutate(next_gen,prob_mutation)
 
@@ -341,30 +368,35 @@ class GenericGeneticHeuristic(Heuristic):
 			next_gen = sorted(next_gen, key = lambda x:x.get_score(), reverse = True)
 
 			replace_gen(current_gen,next_gen)
+			current_gen = sorted(current_gen, key = lambda x:x.get_score(), reverse = True)
 
 		mask = current_gen[0]
 		return mask.get_score()
 
 
+class AGEHeuristic(Heuristic):
+	def __init__(self,classifier):
+		super().__init__(classifier)
+
+	def replace_gen(self,current_gen,next_gen):
+		if current_gen[-2].get_score() < next_gen[0].get_score() and current_gen[-2].get_score() < next_gen[1].get_score():
+			current_gen[-2] = next_gen[0]
+			current_gen[-1]  = next_gen[1]
+		elif current_gen[-1].get_score() < next_gen[0].get_score():
+			current_gen[-1] = next_gen[0]
+
+	def run(self,mask,max_iter):
+		GGHeuristic = GenericGeneticHeuristic(self.classifier)
+		return GGHeuristic.run(mask,max_iter,2,self.replace_gen,1)
+
 class AGGHeuristic(Heuristic):
 	def __init__(self,classifier):
 		super().__init__(classifier)
 
-	def select_parents(self,current_gen):
-		mask_size = current_gen[0].length()
-		idx_parents = random.sample(range(len(current_gen)),4)
-		parents = []
+	def replace_gen(self,current_gen,next_gen):
+		if current_gen[0].get_score() > next_gen[0].get_score():
+			next_gen[-1] = current_gen[0]
 
-		for idx in idx_parents:
-			mask = Mask(mask_size)
-			mask.values = np.copy(current_gen[idx].values)
-			parents.append(mask)
-
-		return parents
-
-	def replace_gen(current_gen,next_gen):
-		pass
-		
 	def run(self,mask,max_iter):
 		GGHeuristic = GenericGeneticHeuristic(self.classifier)
-		return GGHeuristic.run(mask,max_iter,self.select_parents,self.replace_gen,1)
+		return GGHeuristic.run(mask,max_iter,30,self.replace_gen,0.7)
