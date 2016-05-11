@@ -1,0 +1,28 @@
+#! /bin/bash
+
+printf "wdbc BMB\n"
+python ./main.py wdbc BMB
+
+printf "libra BMB\n"
+python ./main.py libras BMB
+
+printf "arrhythmia BMB\n"
+python ./main.py arrhythmia BMB
+
+printf "wdbc GRASP\n"
+python ./main.py wdbc GRASP
+
+printf "libra GRASP\n"
+python ./main.py libras GRASP
+
+printf "arrhythmia GRASP\n"
+python ./main.py arrhythmia GRASP
+
+printf "wdbc ILS\n"
+python ./main.py wdbc ILS
+
+printf "libra ILS\n"
+python ./main.py libras ILS
+
+printf "arrhythmia ILS\n"
+python ./main.py arrhythmia ILS

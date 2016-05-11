@@ -21,8 +21,11 @@ class Mask:
 		else:
 			self.values[i] = True
 
+	def set_false(self):
+		self.values = np.zeros(self.length(), dtype = bool)
+
 	def mutate(self,s):
-		mutate_idx = np.random.choice(range(self.lenght()),s,replace=False)
+		mutate_idx = np.random.choice(range(self.length()),s,replace=False)
 
 		for idx in mutate_idx:
 			self.flip(idx)

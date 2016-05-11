@@ -68,11 +68,11 @@ class DataHandler:
 			l.append(list(data))
 
 		self.__data_values = np.array([l[0][1:31]], dtype = np.float32)
-		self.__data_label = np.array(l[0][0], dtype = np.int32) #TODO :usar code o decode
+		self.__data_label = np.array(ord(l[0][0]), dtype = np.int32)
 
 		for i in range(1,len(l)):
 			self.__data_values = np.append(self.__data_values,np.array([l[i][1:31]], dtype = np.float32), axis = 0)
-			self.__data_label = np.append(self.__data_label,np.array(l[i][0]), dtype = np.int32)
+			self.__data_label = np.append(self.__data_label,np.array(ord(l[i][0]), dtype = np.int32))
 
 		self.__data_values = m.fit_transform(self.__data_values)
 

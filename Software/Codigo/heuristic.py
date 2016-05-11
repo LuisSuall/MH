@@ -173,7 +173,7 @@ class BMBHeuristic(Heuristic):
 	def __init__(self,classifier):
 		super().__init__(classifier)
 
-	def run(mask):
+	def run(self,mask,max_iter):
 		LS = LSHeuristic(self.classifier)
 
 		best_score = 0
@@ -181,7 +181,7 @@ class BMBHeuristic(Heuristic):
 
 		for _ in range(25):
 			mask.randomize()
-			score = LS.run(mask)
+			score = LS.run(mask,max_iter)
 
 			if score > best_score:
 				best_score = score
@@ -194,7 +194,7 @@ class ASFSHeuristic(Heuristic):
 	def __init__(self,classifier):
 		super().__init__(classifier)
 
-	def run(mask, tolerance = 0.3):
+	def run(self,mask, tolerance = 0.3):
 		best_score = 0
 		change_produced = True
 
@@ -202,20 +202,20 @@ class ASFSHeuristic(Heuristic):
 			neighbourhood_best_score = 0
 			neighbourhood_worst_score = 100
 			change_produced = False
-			saved_scores = np.full((mask.length(),2),-100,dtype = float64)
+			saved_scores = np.full((mask.length(),2),-100,dtype = np.float32)
 
 			for idx in range(0,mask.length()):
 				if not mask.get(idx):
 					score = self.classifier.score_train(mask, idx)
 					saved_scores[idx] = [idx,score]
-					if  score > best_score:
+					if  score > neighbourhood_best_score:
 						neighbourhood_best_score = score
-					elif score < worst_score:
+					elif score < neighbourhood_worst_score:
 						neighbourhood_worst_score = score
 
-			min_accepted = best_score - tolerance * (best_score - worst_score)
+			min_accepted = neighbourhood_best_score - tolerance * (neighbourhood_best_score - neighbourhood_worst_score)
 			saved_scores = saved_scores[saved_scores[:,1]>min_accepted]
-			selected_neighbour = saved_scores[random.randint(0,len(saved_scores))]
+			selected_neighbour = saved_scores[random.randint(0,len(saved_scores)-1)]
 
 			if selected_neighbour[1] > best_score:
 				change_produced = True
@@ -229,17 +229,17 @@ class GRASPHeuristic(Heuristic):
 	def __init__(self,classifier):
 		super().__init__(classifier)
 
-	def run(mask):
+	def run(self,mask,max_iter):
 		LS = LSHeuristic(self.classifier)
 		ASFS = ASFSHeuristic(self.classifier)
 
 		best_score = 0
-		best_mask = Mask(mask.lenght)
+		best_mask = Mask(mask.length())
 
 		for _ in range(25):
 			mask.set_false()
-			ASFS.run(mask)
-			score = LS.run(mask)
+			score_asfs = ASFS.run(mask)
+			score = LS.run(mask,max_iter)
 
 			if score > best_score:
 				best_score = score
@@ -253,17 +253,17 @@ class ILSHeuristic(Heuristic):
 	def __init__(self,classifier):
 		super().__init__(classifier)
 
-	def run(mask):
+	def run(self,mask,max_iter):
 		LS = LSHeuristic(self.classifier)
-		s = round(mask.lenght*0.1)
+		s = round(mask.length()*0.1)
 
-		best_score = LS.run(mask)
-		best_mask = Mask(mask.lenght)
+		best_score = LS.run(mask,max_iter)
+		best_mask = Mask(mask.length())
 		best_mask.values = np.copy(mask.values)
 
 		for _ in range(24):
 			mask.mutate(s)
-			score = LS.run(mask)
+			score = LS.run(mask,max_iter)
 
 			if score > best_score:
 				best_score = score

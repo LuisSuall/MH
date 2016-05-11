@@ -28,9 +28,17 @@ def main():
 			my_heuristic = heuristic.SAHeuristic(None)
 		elif sys.argv[2] == "TS":
 			my_heuristic = heuristic.TABUHeuristic(None)
+		elif sys.argv[2] == "BMB":
+			my_heuristic = heuristic.BMBHeuristic(None)
+		elif sys.argv[2] == "GRASP":
+			my_heuristic = heuristic.GRASPHeuristic(None)
+		elif sys.argv[2] == "ILS":
+			my_heuristic = heuristic.ILSHeuristic(None)
 		else:
-			print("Opcion de BD incorrecta")
+			print("Opcion de heuristica incorrecta")
 			return
+
+		file_name = "./Results/"+sys.argv[2]+"-"+sys.argv[1]+".csv"
 
 		seeds = [12345678,90123456,78901234,456789012,34567890]
 		if len(sys.argv) > 3:
@@ -41,41 +49,9 @@ def main():
 			random.seed(seed)
 			train_data, train_label, test_data, test_label = data_hand.split()
 
-			#my_classifier = classifier.Classifier(train_data, train_label, test_data, test_label)
-			my_mask = mask.Mask(train_data.shape[1])
-			my_mask.values = np.ones(train_data.shape[1],dtype = np.bool)
-
-			cuda_knn = knnLooGPU(train_data, train_label, 3)
-			ulta_pro_mask = np.array(range(70),dtype = np.int32)
-
-
-			print("Valor de la máscara")
-			print(my_mask.values)
-			print("SUMA:")
-			print(my_mask.values.sum())
-
-			t_start = time.time()
-			for _ in range(100):
-				score = cuda_knn.scoreSolution(ulta_pro_mask)
-			t_end = time.time()
-			print("Er cuda del Montoro to reshu sin mi clase intermedia")
-			print("Score: " +  str(score))
-			print("Tiempo: " + str(t_end - t_start))
-
-			t_start = time.time()
-			for _ in range(100):
-				score = my_classifier.cuda_score(my_mask)
-			t_end = time.time()
-			print("Er cuda del Montoro to reshu con mi clase intermedia")
-			print("Score: " +  str(score))
-			print("Tiempo: " + str(t_end - t_start))
-
-			t_start = time.time()
-			for _ in range(100):
-				score = my_classifier.score_train(my_mask)
-			t_end = time.time()
-			print("Score: " +  str(score))
-			print("Tiempo: " + str(t_end - t_start))
+			my_classifier = classifier.Classifier(train_data, train_label, test_data, test_label)
+			my_mask = mask.Mask(len(train_data[0]))
+			my_mask.randomize()
 
 			my_heuristic.set_classifier(my_classifier)
 
@@ -90,14 +66,23 @@ def main():
 					reduction += 1
 
 			reduction = 100 * (len(my_mask.values)-reduction)/len(my_mask.values)
-			out_score = my_classifier.score_test(my_mask) * 100
+			out_score = my_classifier.score_test(my_mask)
 
+			score = round(score,2)
+			out_score = round(out_score,2)
+			reduction = round(reduction,2)
+			total_time = round(end_time-start_time,2)
 			print("Mascara obtenida")
 			print(my_mask.values)
 			print("Reduccion: " + str(reduction))
 			print("Score de entrenamiento: " + str(score))
 			print("Score de test: " + str(out_score))
-			print("Tiempo transcurrido: " + str(end_time - start_time))
+			print("Tiempo transcurrido: " + str(total_time))
+
+			with open(file_name,'a',newline='') as csvfile:
+				spamwriter = csv.writer(csvfile, delimiter=' ',
+				                        quotechar='|', quoting=csv.QUOTE_MINIMAL)
+				spamwriter.writerow([score,out_score,reduction,total_time])
 
 			my_classifier = classifier.Classifier(test_data, test_label,train_data, train_label)
 			my_mask = mask.Mask(len(train_data[0]))
@@ -116,14 +101,23 @@ def main():
 					reduction += 1
 
 			reduction = 100 * (len(my_mask.values)-reduction)/len(my_mask.values)
-			out_score = my_classifier.score_test(my_mask) * 100
+			out_score = my_classifier.score_test(my_mask)
 
+			score = round(score,2)
+			out_score = round(out_score,2)
+			reduction = round(reduction,2)
+			total_time = round(end_time-start_time,2)
 			print("Mascara obtenida")
 			print(my_mask.values)
 			print("Reduccion: " + str(reduction))
 			print("Score de entrenamiento: " + str(score))
 			print("Score de test: " + str(out_score))
-			print("Tiempo transcurrido: " + str(end_time - start_time))
+			print("Tiempo transcurrido: " + str(total_time))
+
+			with open(file_name,'a',newline='') as csvfile:
+				spamwriter = csv.writer(csvfile, delimiter=' ',
+				                        quotechar='|', quoting=csv.QUOTE_MINIMAL)
+				spamwriter.writerow([score,out_score,reduction,total_time])
 
 	else:
 		print("Número de parámetros incorrectos.")
