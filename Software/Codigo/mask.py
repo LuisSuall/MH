@@ -4,6 +4,7 @@ class Mask:
 
 	def __init__(self,length):
 		self.values = np.zeros(length, dtype = bool)
+		self.score = 0
 
 	def randomize(self):
 		self.values = np.random.choice([True,False], len(self.values),
@@ -11,6 +12,15 @@ class Mask:
 
 	def get(self,i):
 		return self.values[i]
+
+	def set(self,i,value):
+		self.values[i] = value
+		
+	def get_score(self):
+		return self.score
+
+	def set_score(self,score):
+		self.score = score
 
 	def length(self):
 		return len(self.values)

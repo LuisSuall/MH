@@ -34,6 +34,10 @@ def main():
 			my_heuristic = heuristic.GRASPHeuristic(None)
 		elif sys.argv[2] == "ILS":
 			my_heuristic = heuristic.ILSHeuristic(None)
+		elif sys.argv[2] == "AGG":
+			my_heuristic = heuristic.AGGHeuristic(None)
+		elif sys.argv[2] == "AGE":
+			my_heuristic = heuristic.AGGHeuristic(None)
 		else:
 			print("Opcion de heuristica incorrecta")
 			return
