@@ -235,29 +235,11 @@ Para la realización de los algoritmos, se utilizó Python 3 de manera directa, 
 
 Para usar el programa, hay que ejecutar la orden  python3 main.py BaseDatos Heurística Semilla. Si no se introduce semilla, se utilizan las usadas para obtener los resultados.
 \newpage
-\section{Análisis de resultados}
+\section{Resultados}
 
-Los resultados se encuentran al final del documento.\\
-
-Primero, podemos ver que los tres modelos mejoran a los algoritmos de control ---KNN y SFS---. Esto era de esperar, pues el espacio explorado es mucho más grande gracias a las reinicializaciones y a la calidad de los resultados que nos da LS, que por si mismo ya encuentra resultados cercanos a SFS.\\
-
-Por otro lado, destacar que GRASP gana a sus competidores. El partir de una solución de calidad para después realizar LS, genera muy buenos resultados. Además, la búsqueda local casi no tiene que hacer trabajo, por la calidad de la solución inicial, siendo muy rápida su ejecución y penalizando, pero no en exceso, el tiempo de ejecución. Además, por la forma de construcción de las soluciones iniciales, consigue una gran tasa de reducción, lo que puede ser muy importante en una aplicación real.\\
-
-Entre ILS y BMB hay pocas diferencias. ILS mejora con respecto a BMB, pero recordemos que BMB da una solución inicial aleatoria, por lo tanto cabría esperar que ILS mejorara más con respecto a BMB. Eso sí, como las soluciones que va generando ILS están relativamente cerca de un óptimo, va ligeramente más rápido que BMB. Luego podríamos decir que ILS funciona mejor que BMB, pero no por mucho.\\
-
-En resumen, el mejor método es con diferencia GRASP, seguido por ILS y BMB, en ese orden.\\
+Mostramos los resultados.\\
 
 \newpage
-\section{Referencias}
-Aparte de la documentación de la asignatura, he usado las páginas de referencia del software usado para desarrollar las prácticas:
-\begin{itemize}
-\item Python:  \url{https://docs.python.org/3/}
-\item Numpy y Scipy: \url{http://docs.scipy.org/doc/}
-\item Scikit-learn: \url{http://scikit-learn.org/stable/documentation.html}
-\item K-nn CUDA: \url{https://github.com/agarciamontoro/metaheuristics}
-\end{itemize}
-\newpage
-
 \begin{table}[]
 \centering
 \caption{KNN}
@@ -301,70 +283,13 @@ Aparte de la documentación de la asignatura, he usado las páginas de referenci
 \multicolumn{1}{|l|}{Medias} & 96.86    & 95.53   & 44.66  & 0.44   & 71.83    & 73.38   & 47.88  & 2.35   & 67.97    & 63.63   & 50.53  & 51.60  \\ \hline
 \end{tabular}}
 \end{table}
-
-\begin{table}[]
-\centering
-\caption{BMB}
-\label{my-label}
-\resizebox{\textwidth}{!}{\begin{tabular}{l|l|l|l|l|l|l|l|l|l|l|l|l|}
-\cline{2-13}
-                             & \multicolumn{4}{l|}{Wdbc}            & \multicolumn{4}{l|}{Libras}          & \multicolumn{4}{l|}{Arrhythmia}       \\ \cline{2-13} 
-                             & \% train & \% test & \% red & tiempo & \% train & \% test & \% red & tiempo & \% train & \% test & \% red & tiempo  \\ \hline
-\multicolumn{1}{|l|}{P 1-1}  & 98.59    & 96.49   & 50.0   & 13.21  & 76.11    & 70.56   & 53.33  & 78.12  & 73.44    & 63.4    & 51.44  & 1309.78 \\ \hline
-\multicolumn{1}{|l|}{P 1-2}  & 98.95    & 94.72   & 56.67  & 11.77  & 77.78    & 83.33   & 54.44  & 71.54  & 71.65    & 62.5    & 48.56  & 1083.94 \\ \hline
-\multicolumn{1}{|l|}{P 2-1}  & 98.24    & 95.44   & 40.0   & 12.42  & 79.44    & 68.89   & 42.22  & 75.26  & 73.44    & 68.56   & 51.08  & 1110.23 \\ \hline
-\multicolumn{1}{|l|}{P 2-2}  & 98.25    & 94.01   & 56.67  & 12.31  & 80.0     & 76.11   & 54.44  & 70.4   & 73.71    & 65.1    & 51.44  & 1087.23 \\ \hline
-\multicolumn{1}{|l|}{P 3-1}  & 98.24    & 95.44   & 63.33  & 12.66  & 83.89    & 75.56   & 57.78  & 77.93  & 72.4     & 62.89   & 46.76  & 1411.0  \\ \hline
-\multicolumn{1}{|l|}{P 3-2}  & 98.6     & 96.13   & 40.0   & 13.12  & 77.22    & 73.33   & 45.56  & 92.52  & 72.16    & 65.1    & 51.44  & 1084.71 \\ \hline
-\multicolumn{1}{|l|}{P 4-1}  & 97.54    & 93.68   & 70.0   & 13.16  & 78.33    & 69.44   & 60.0   & 66.49  & 72.92    & 68.04   & 51.08  & 1200.48 \\ \hline
-\multicolumn{1}{|l|}{P 4-2}  & 99.3     & 94.01   & 43.33  & 10.64  & 79.44    & 66.67   & 55.56  & 70.57  & 72.16    & 65.1    & 50.72  & 1069.36 \\ \hline
-\multicolumn{1}{|l|}{P 5-1}  & 97.89    & 95.09   & 50.0   & 10.22  & 75.0     & 72.78   & 64.44  & 74.05  & 71.35    & 64.43   & 51.44  & 1168.29 \\ \hline
-\multicolumn{1}{|l|}{P 5-2}  & 98.25    & 95.77   & 53.33  & 11.7   & 78.33    & 74.44   & 52.22  & 68.01  & 73.2     & 63.54   & 50.72  & 1043.26 \\ \hline
-\multicolumn{1}{|l|}{Medias} & 98.38    & 95.07   & 52.33  & 12.12  & 78.55    & 73.11   & 53.99  & 74.48  & 72.64    & 64.86   & 50.46  & 1156.82 \\ \hline
-\end{tabular}}
-\end{table}
-
-\begin{table}[]
-\centering
-\caption{GRASP}
-\label{my-label}
-\resizebox{\textwidth}{!}{\begin{tabular}{l|l|l|l|l|l|l|l|l|l|l|l|l|}
-\cline{2-13}
-                             & \multicolumn{4}{l|}{Wdbc}            & \multicolumn{4}{l|}{Libras}          & \multicolumn{4}{l|}{Arrhythmia}      \\ \cline{2-13} 
-                             & \% train & \% test & \% red & tiempo & \% train & \% test & \% red & tiempo & \% train & \% test & \% red & tiempo \\ \hline
-\multicolumn{1}{|l|}{P 1-1}  & 98.59    & 93.33   & 70.0   & 17.55  & 78.33    & 70.56   & 85.56  & 75.49  & 85.42    & 69.59   & 93.53  & 193.89 \\ \hline
-\multicolumn{1}{|l|}{P 1-2}  & 98.6     & 95.77   & 73.33  & 19.33  & 80.0     & 80.56   & 88.89  & 72.45  & 81.44    & 70.83   & 95.32  & 118.54 \\ \hline
-\multicolumn{1}{|l|}{P 2-1}  & 98.59    & 93.68   & 66.67  & 19.32  & 81.67    & 73.89   & 87.78  & 68.65  & 84.38    & 69.07   & 92.45  & 196.05 \\ \hline
-\multicolumn{1}{|l|}{P2-2}   & 98.25    & 94.72   & 83.33  & 18.07  & 80.56    & 70.56   & 82.22  & 75.61  & 86.08    & 69.79   & 94.24  & 131.0  \\ \hline
-\multicolumn{1}{|l|}{P 3-1}  & 98.59    & 91.93   & 70.0   & 17.51  & 84.44    & 76.11   & 82.22  & 77.61  & 80.73    & 66.49   & 93.88  & 133.76 \\ \hline
-\multicolumn{1}{|l|}{P 3-2}  & 98.25    & 96.48   & 73.33  & 17.17  & 77.78    & 73.33   & 83.33  & 78.66  & 85.57    & 71.35   & 95.68  & 165.34 \\ \hline
-\multicolumn{1}{|l|}{P 4-1}  & 97.18    & 97.54   & 70.0   & 15.73  & 78.33    & 70.56   & 82.22  & 75.14  & 82.29    & 72.16   & 91.37  & 190.58 \\ \hline
-\multicolumn{1}{|l|}{P 4-2}  & 99.3     & 94.72   & 70.0   & 16.98  & 80.0     & 66.67   & 85.56  & 77.34  & 85.05    & 77.6    & 94.6   & 140.69 \\ \hline
-\multicolumn{1}{|l|}{P 5-1}  & 98.59    & 92.28   & 70.0   & 17.13  & 78.89    & 73.89   & 85.56  & 70.15  & 86.98    & 77.84   & 94.96  & 143.29 \\ \hline
-\multicolumn{1}{|l|}{P 5-2}  & 98.25    & 96.83   & 80.0   & 17.94  & 81.67    & 73.33   & 84.44  & 67.95  & 82.99    & 71.88   & 93.88  & 152.08 \\ \hline
-\multicolumn{1}{|l|}{Medias} & 98.41    & 94.72   & 72.66  & 17.67  & 80.16    & 72.94   & 84.7   & 73.9   & 84.09    & 71.66   & 93.99  & 156.52 \\ \hline
-\end{tabular}}
-\end{table}
-
-\begin{table}[]
-\centering
-\caption{ILS}
-\label{my-label}
-\resizebox{\textwidth}{!}{\begin{tabular}{l|l|l|l|l|l|l|l|l|l|l|l|l|}
-\cline{2-13}
-                             & \multicolumn{4}{l|}{Wdbc}            & \multicolumn{4}{l|}{Libras}          & \multicolumn{4}{l|}{Arrhythmia}       \\ \cline{2-13} 
-                             & \% train & \% test & \% red & tiempo & \% train & \% test & \% red & tiempo & \% train & \% test & \% red & tiempo  \\ \hline
-\multicolumn{1}{|l|}{P 1-1}  & 98.94    & 96.14   & 50.0   & 11.28  & 76.11    & 73.89   & 57.78  & 66.95  & 78.12    & 63.92   & 53.6   & 1075.2  \\ \hline
-\multicolumn{1}{|l|}{P 1-2}  & 98.6     & 96.83   & 53.33  & 9.94   & 76.67    & 82.78   & 51.11  & 65.05  & 73.71    & 71.88   & 55.4   & 803.65  \\ \hline
-\multicolumn{1}{|l|}{P 2-1}  & 99.3     & 95.44   & 50.0   & 8.73   & 80.56    & 70.56   & 56.67  & 72.94  & 72.92    & 62.37   & 47.48  & 1061.74 \\ \hline
-\multicolumn{1}{|l|}{P 2-2}  & 98.25    & 96.13   & 53.33  & 10.35  & 79.44    & 73.89   & 60.0   & 57.12  & 74.74    & 66.67   & 55.04  & 843.96  \\ \hline
-\multicolumn{1}{|l|}{P 3-1}  & 98.24    & 95.79   & 33.33  & 13.03  & 85.0     & 73.33   & 51.11  & 65.55  & 76.56    & 64.95   & 52.88  & 1037.26 \\ \hline
-\multicolumn{1}{|l|}{P 3-2}  & 98.6     & 96.48   & 53.33  & 10.38  & 78.33    & 73.33   & 61.11  & 51.42  & 75.77    & 66.15   & 56.47  & 912.49  \\ \hline
-\multicolumn{1}{|l|}{P 4-1}  & 97.54    & 97.54   & 40.0   & 12.07  & 77.78    & 72.22   & 50.0   & 61.15  & 74.48    & 64.43   & 50.0   & 1055.89 \\ \hline
-\multicolumn{1}{|l|}{P 4-2}  & 99.3     & 95.42   & 46.67  & 8.92   & 78.33    & 68.33   & 61.11  & 51.36  & 75.77    & 67.19   & 52.88  & 909.47  \\ \hline
-\multicolumn{1}{|l|}{P 5-1}  & 97.89    & 94.04   & 50.0   & 10.36  & 77.78    & 73.89   & 55.56  & 65.19  & 71.88    & 61.86   & 44.6   & 1073.12 \\ \hline
-\multicolumn{1}{|l|}{P 5-2}  & 98.25    & 96.13   & 53.33  & 9.32   & 78.89    & 71.67   & 54.44  & 54.04  & 75.77    & 64.06   & 52.52  & 1036.64 \\ \hline
-\multicolumn{1}{|l|}{Medias} & 98.49    & 95.99   & 48.33  & 10.43  & 78.88    & 73.38   & 55.88  & 61.07  & 74.97    & 65.34   & 52.08  & 980.94  \\ \hline
-\end{tabular}}
-\end{table}
+\newpage
+\section{Referencias}
+Aparte de la documentación de la asignatura, he usado las páginas de referencia del software usado para desarrollar las prácticas:
+\begin{itemize}
+\item Python:  \url{https://docs.python.org/3/}
+\item Numpy y Scipy: \url{http://docs.scipy.org/doc/}
+\item Scikit-learn: \url{http://scikit-learn.org/stable/documentation.html}
+\item K-nn CUDA: \url{https://github.com/agarciamontoro/metaheuristics}
+\end{itemize}
 \end{document}
