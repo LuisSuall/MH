@@ -124,74 +124,46 @@ En esta sección veremos los componentes en común de los diferentes algoritmos.
 \item Clasificar los datos de test y comprobar si coinciden con sus verdaderas etiquetas.
 \end{itemize} 
 Además, para poder ver lo bien que clasifica al propio conjunto de entrenamiento, realizamos "Leave One Out", que consiste en, para cada dato del conjunto de entrenamiento, quitarlo de los datos de entrenamiento, clasificarlo y ver si hemos acertado al clasificar o no.
-\item \textbf{Generación de vecindario:} El vecindario serán las soluciones que solo difieran de la actual un bit. La generación del vecino i-ésimo podría realizarse de la siguiente forma: Si el valor en la posición i es verdadero, ponerlo a falso.Si no, ponerlo a verdadero. 
-\item Uno de los parámetros de los algoritmos a la hora de ejecutarlos es la solución inicial. Esto nos permitirá utilizar estos mismos métodos para la realización de búsqueda multiarranque, por ejemplo. Por tanto, el calculo de una solución de inicio aleatoria se encuentra fuera de los algoritmos.
 \item \textbf{Generación de soluciones aleatorias:} Se guardan en la máscara los resultados de muestrear una binomial que nos devuelve valores verdadero y falso con la misma probabilidad.
-\end{itemize}
+\item \textbf{Selección:} Dado $n$ el tamaño de la población objetivo. Se seleccionan $2n$ individuos de la población anterior aleatoriamente. Se comparan en orden --- primero con segundo, tercero con cuarto--- y devolvemos los individuos que sean mejores de cada comparación.
+\item \textbf{Operación de cruce de una pareja:} Si ambos padres tienen el mismo gen ---verdadero o falso--- sus hijos tienen ese gen. Si los padres tienen un gen distinto, aleatoriamente un hijo recibirá un valor y el otro hijo el otro.
+\item \textbf{Operación de cruce:} Dado $p$ la probabilidad de cruce. Se tomarán los primeros $2n$ padres y se cruzan con el operador de cruce de parejas en orden --primero con segundo, tercero con cuarto,...---. $n$ es el número de cruces, que se calcula como $n = \lfloor\frac{n_{padres} * p}{2}\rfloor$.
+\item \textbf{Operación de mutación:} Sea $p$ la probabilidad de mutación y $g$ el número de genes en total de la población a mutar. Entonces se deciden mutar $\lfloor p*g \rfloor$ genes. Generamos aleatoriamente que genes se van a mutar, y para cada uno de ellos, cambiamos su valor al opuesto.
+\end{itemize} 
 \newpage
 \section{Explicación de los algoritmos}
 
+Los algoritmos AGE y AGG se diferencian en los parámetros de probabilidad de cruce, tamaño de la población de hijos a generar y probabilidad de mutación, además de la función de reemplazamiento de la población.\\
+
+Los parámetros son los indicados en el documento de prácticas.\\
+
+Vamos a ver un esquema general del algoritmo genético, y luego las funciones de reemplazamiento de cada modelo concreto. Se usan las funciones explicadas en la sección anterior para cruce, mutación y selección.\\
+
 \subsection{Genético general}
-\textbf{Búsqueda multiarranque básico}
+
 \begin{itemize}
-\item Realizar 25 veces:
+\item Generar una población inicial aleatoria, evaluarla y ordenarla. Se considera como población actual.
+\item Mientras no se supere el límite de evaluaciones:
 \begin{itemize}
-\item Calcular solución aleatoria.
-\item Realizar búsqueda local a la solución.
-\item Si es mejor que la mejor solución hasta el momento, guardarla como nueva mejor solución
+\item Seleccionar los padres de la nueva generación.
+\item Cruzar los padres.
+\item Mutar el resultado anterior. El resultado es la nueva generación.
+\item Evaluamos y ordenamos la nueva generación.
+\item Reemplazamos y ordenamos la generación actual usando la función de reemplazamiento.
 \end{itemize} 
-\item Devuelve la mejor solución encontrada y el valor de su función objetivo.
+\item Devuelve la mejor solución de la generación actual y el valor de su función objetivo.
 \end{itemize} 
 \newpage
 \subsection{AGE}
-\textbf{ASFS:}
+\textbf{Función de reemplazamiento:}
 \begin{itemize}
-\item La solución empieza completamente a falso.
-\item Mientras que encontremos mejora:
-\begin{itemize}
-\item Creamos un vector para guardar los valores de la función objetivo
-\item Inicializamos valores para guardar los máximos y mínimos encontrados.
-\item Para cada característica, si no es verdadera:
-\begin{itemize}
-\item Guardar su valor de función objetivo y posición.
-\item Actualizar el mejor y peor valor de la función objetivo si fuera necesario.
-\end{itemize}
-\item Calculamos el mínimo aceptado como $M-t(M-m)$, siendo M el máximo valor de la función objetivo, m el mínimo y t la tolerancia admitida.
-\item Tomamos los vecinos que superen el mínimo y elegimos uno aleatoriamente.
-\item Si el vecino supera a la solución anterior, se toma como siguiente solución y se marca que se ha realizado mejora.
-\end{itemize}
-\item Devuelve la solución encontrada.
+\item Comparamos las dos peores soluciones de la generación actual y las dos soluciones de la nueva generación. Devolvemos en generación actual las $n-2$ mejores soluciones de la generación actual y las 2 mejores soluciones de las comparadas antes.
 \end{itemize}
 
-\textbf{GRASP:}
-\begin{itemize}
-\item Realizar 25 veces:
-\begin{itemize}
-\item Calcular solución inicial con ASFS.
-\item Realizar búsqueda local a la solución.
-\item Si es mejor que la mejor solución hasta el momento, guardarla como nueva mejor solución
-\end{itemize} 
-\item Devuelve la mejor solución encontrada y el valor de su función objetivo.
-\end{itemize} 
-\newpage
 \subsection{AGG}
-\textbf{Función de mutación:}
+\textbf{Función de reemplazamiento:}
 \begin{itemize}
-\item Tomamos $s$ elementos sin remplazamiento de los números enteros desde el 0 hasta el número de características del problema, sin contar este último.  
-\item Modificamos los valores seleccionados en la solución.
-\end{itemize} 
-
-\textbf{Iterated Local Search:}
-\begin{itemize}
-\item Realizamos la búsqueda local sobre la solución inicial.
-\item Guardamos el resultado como mejor función objetivo encontrada y mejor solución encontrada.
-\item Realizamos 24 veces:
-\begin{itemize}
-\item Muta la solución.
-\item Realiza una búsqueda local sobre la solución mutada.
-\item Si la solución encontrada por la búsqueda local mejora la mejor hasta el momento, la sustituye.
-\end{itemize} 
-\item Devuelve la mejor solución encontrada y el valor de su función objetivo.
+\item Miramos si la mejor solución de la nueva generación supera a la mejor solución de la generación actual. Si es así, la nueva generación pasará a ser la generación actual. Si no es así, cambiamos el peor valor de la nueva generación por el mejor de la generación actual, y el resultado es la nueva generación actual.
 \end{itemize} 
 
 \newpage
