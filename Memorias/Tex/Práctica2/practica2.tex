@@ -236,12 +236,27 @@ Para la realización de los algoritmos, se utilizó Python 3 de manera directa, 
 Para usar el programa, hay que ejecutar la orden  python3 main.py BaseDatos Heurística Semilla. Si no se introduce semilla, se utilizan las usadas para obtener los resultados.
 \newpage
 \section{Análisis de resultados}
+\begin{table}[]
+\centering
+\caption{Resumen}
+\label{my-label}
+\resizebox{\textwidth}{!}{\begin{tabular}{l|l|l|l|l|l|l|l|l|l|}
+\cline{2-10}
+                            & \multicolumn{3}{l|}{Wdbc}  & \multicolumn{3}{l|}{Libras} & \multicolumn{3}{l|}{Arrhythmia} \\ \cline{2-10} 
+                            & \% train & \% red & tiempo & \% train  & \% red & tiempo & \% train   & \% red  & tiempo   \\ \hline
+\multicolumn{1}{|l|}{3-NN}  & 96.44    & 0.0    & 0.02   & 68.89     & 0.0    & 0.04   & 63.36      & 0.0     & 0.12     \\ \hline
+\multicolumn{1}{|l|}{SFS}   & 96.86    & 44.66  & 0.44   & 71.83     & 47.88  & 2.35   & 67.97      & 50.53   & 51.6     \\ \hline
+\multicolumn{1}{|l|}{BMB}   & 98.38    & 52.33  & 12.12  & 78.33     & 53.99  & 74.48  & 72.64      & 50.46   & 1156.82  \\ \hline
+\multicolumn{1}{|l|}{GRASP} & 98.41    & 72.66  & 17.67  & 80.16     & 84.7   & 73.9   & 84.09      & 93.99   & 156.52   \\ \hline
+\multicolumn{1}{|l|}{ILS}   & 98.49    & 48.33  & 10.43  & 78.88     & 55.88  & 61.07  & 74.97      & 52.08   & 980.94   \\ \hline
+\end{tabular}}
+\end{table}
 
 Los resultados se encuentran al final del documento.\\
 
 Primero, podemos ver que los tres modelos mejoran a los algoritmos de control ---KNN y SFS---. Esto era de esperar, pues el espacio explorado es mucho más grande gracias a las reinicializaciones y a la calidad de los resultados que nos da LS, que por si mismo ya encuentra resultados cercanos a SFS.\\
 
-Por otro lado, destacar que GRASP gana a sus competidores. El partir de una solución de calidad para después realizar LS, genera muy buenos resultados. Además, la búsqueda local casi no tiene que hacer trabajo, por la calidad de la solución inicial, siendo muy rápida su ejecución y penalizando, pero no en exceso, el tiempo de ejecución. Además, por la forma de construcción de las soluciones iniciales, consigue una gran tasa de reducción, lo que puede ser muy importante en una aplicación real.\\
+Por otro lado, destacar que GRASP gana a sus competidores. El partir de una solución de calidad para después realizar LS, genera muy buenos resultados. Además, la búsqueda local casi no tiene que hacer trabajo, por la calidad de la solución inicial, siendo muy rápida su ejecución y penalizando, pero no en exceso, el tiempo de ejecución. Además, por la forma de construcción de las soluciones iniciales, consigue una gran tasa de reducción, lo que puede ser muy importante en una aplicación real. Además, tras observar los tiempos de las distintas evaluaciones, esa gran reducción hace que el tiempo sea mucho menor para la base de datos Arrhythmia.\\
 
 Entre ILS y BMB hay pocas diferencias. ILS mejora con respecto a BMB, pero recordemos que BMB da una solución inicial aleatoria, por lo tanto cabría esperar que ILS mejorara más con respecto a BMB. Eso sí, como las soluciones que va generando ILS están relativamente cerca de un óptimo, va ligeramente más rápido que BMB. Luego podríamos decir que ILS funciona mejor que BMB, pero no por mucho.\\
 

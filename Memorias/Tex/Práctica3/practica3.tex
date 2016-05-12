@@ -190,7 +190,20 @@ Para la realización de los algoritmos, se utilizó Python 3 de manera directa, 
 Para usar el programa, hay que ejecutar la orden  python3 main.py BaseDatos Heurística Semilla. Si no se introduce semilla, se utilizan las usadas para obtener los resultados.
 \newpage
 \section{Análisis de resultados}
-
+\begin{table}[]
+\centering
+\caption{Resumen}
+\label{my-label}
+\resizebox{\textwidth}{!}{\begin{tabular}{l|l|l|l|l|l|l|l|l|l|}
+\cline{2-10}
+                           & \multicolumn{3}{l|}{Wdbc}  & \multicolumn{3}{l|}{Libras} & \multicolumn{3}{l|}{Arrhythmia} \\ \cline{2-10} 
+                           & \% train & \% red & tiempo & \% train  & \% red & tiempo & \% train   & \% red   & tiempo  \\ \hline
+\multicolumn{1}{|l|}{3-NN} & 96.44    & 0.0    & 0.02   & 68.89     & 0.0    & 0.04   & 63.36      & 0.0      & 0.12    \\ \hline
+\multicolumn{1}{|l|}{SFS}  & 96.86    & 44.66  & 0.44   & 71.83     & 47.88  & 2.35   & 67.97      & 50.53    & 51.6    \\ \hline
+\multicolumn{1}{|l|}{AGG}  & 96.97    & 49.33  & 126.26 & 72.55     & 50.22  & 229.14 & 66.11      & 50.25    & 977.53  \\ \hline
+\multicolumn{1}{|l|}{AGE}  & 98.38    & 52.33  & 132.47 & 78.77     & 48.55  & 218.4  & 74.09      & 50.03    & 942.40  \\ \hline
+\end{tabular}}
+\end{table}
 Los resultados se encuentran al final del documento.\\
 
 Hemos obtenido unos resultados algo sorprendentes. Por un lado, el genético generacional, pese a realizar un número muy grande de evaluaciones, se encuentra en los rangos de acierto de SFS, uno de las heurísticas de comparación. Esto nos indica que el genético no funciona muy bien en su estado actual. Más adelante se realizará una ampliación de estos modelos genéticos utilizando una búsqueda local para mejorar a la población, y realizando esto se espera un mejor comportamiento.\\
