@@ -15,7 +15,7 @@ class Mask:
 
 	def set(self,i,value):
 		self.values[i] = value
-		
+
 	def get_score(self):
 		return self.score
 
@@ -34,6 +34,9 @@ class Mask:
 	def set_false(self):
 		self.values = np.zeros(self.length(), dtype = bool)
 
+	def set_true(self):
+		self.values = np.ones(self.length(), dtype = bool)
+		
 	def mutate(self,s):
 		mutate_idx = np.random.choice(range(self.length()),s,replace=False)
 

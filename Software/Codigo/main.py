@@ -28,6 +28,8 @@ def main():
 			my_heuristic = heuristic.SAHeuristic(None)
 		elif sys.argv[2] == "TS":
 			my_heuristic = heuristic.TABUHeuristic(None)
+		elif sys.argv[2] == "KNN":
+			my_heuristic = heuristic.KNNHeuristic(None)
 		elif sys.argv[2] == "BMB":
 			my_heuristic = heuristic.BMBHeuristic(None)
 		elif sys.argv[2] == "GRASP":

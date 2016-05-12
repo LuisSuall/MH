@@ -169,6 +169,15 @@ class TABUHeuristic(Heuristic):
 		mask.values = np.copy(best_mask.values)
 		return best_score
 
+class KNNHeuristic(Heuristic):
+
+	def __init__(self,classifier):
+		super().__init__(classifier)
+
+	def run(self,mask,max_iter):
+		mask.set_true()
+		return self.classifier.score_train(mask)
+		
 class BMBHeuristic(Heuristic):
 
 	def __init__(self,classifier):
