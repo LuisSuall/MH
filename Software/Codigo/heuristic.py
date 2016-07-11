@@ -458,9 +458,6 @@ class MemeticHeuristic(GenericGeneticHeuristic):
 		while num_evals < max_iter:
 			gen_number += 1
 
-			print("Generación: " + str(gen_number))
-			print("Número evaluaciones: " + str(num_evals))
-
 			next_gen = self.select_parents(current_gen,num_parents)
 			self.cross(next_gen,prob_cross)
 			self.mutate(next_gen,prob_mutation)
@@ -475,9 +472,7 @@ class MemeticHeuristic(GenericGeneticHeuristic):
 			current_gen = sorted(next_gen, key = lambda x:x.get_score(), reverse = True)
 
 			if gen_number % 10 == 0:
-				print("He entrado en el LS.")
 				num_evals += self.memetic_LS(current_gen,self.num_LS,self.elitism_LS)
-				print("num_evals: " + str(num_evals))
 
 			current_gen = sorted(current_gen, key = lambda x:x.get_score(), reverse = True)
 
