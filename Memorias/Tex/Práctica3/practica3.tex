@@ -51,8 +51,8 @@
 %	HEADING SECTIONS
 %----------------------------------------------------------------------------------------
 
-\textsc{\LARGE Práctica 2.b}\\[1.0cm] % Name of your university/college
-\textsc{\Large Multiarranque}\\[0.5cm] % Major heading such as course name
+\textsc{\LARGE Práctica 3.b}\\[1.0cm] % Name of your university/college
+\textsc{\Large Genéticos}\\[0.5cm] % Major heading such as course name
 \textsc{\large Selección de características}\\[0.5cm] % Minor heading such as course title
 
 %----------------------------------------------------------------------------------------
@@ -60,7 +60,7 @@
 %----------------------------------------------------------------------------------------
 
 \HRule \\[0.4cm]
-{Algoritmos considerados: BMB,GRASP,ILS}\\[0.4cm] % Title of your document
+{Algoritmos considerados: AGG,AGE}\\[0.4cm] % Title of your document
 
  
 %----------------------------------------------------------------------------------------
@@ -124,92 +124,46 @@ En esta sección veremos los componentes en común de los diferentes algoritmos.
 \item Clasificar los datos de test y comprobar si coinciden con sus verdaderas etiquetas.
 \end{itemize} 
 Además, para poder ver lo bien que clasifica al propio conjunto de entrenamiento, realizamos "Leave One Out", que consiste en, para cada dato del conjunto de entrenamiento, quitarlo de los datos de entrenamiento, clasificarlo y ver si hemos acertado al clasificar o no.
-\item \textbf{Generación de vecindario:} El vecindario serán las soluciones que solo difieran de la actual un bit. La generación del vecino i-ésimo podría realizarse de la siguiente forma: Si el valor en la posición i es verdadero, ponerlo a falso.Si no, ponerlo a verdadero. 
-\item Uno de los parámetros de los algoritmos a la hora de ejecutarlos es la solución inicial. Esto nos permitirá utilizar estos mismos métodos para la realización de búsqueda multiarranque, por ejemplo. Por tanto, el calculo de una solución de inicio aleatoria se encuentra fuera de los algoritmos.
 \item \textbf{Generación de soluciones aleatorias:} Se guardan en la máscara los resultados de muestrear una binomial que nos devuelve valores verdadero y falso con la misma probabilidad.
-\end{itemize}
-\subsection{BL}
-Para generar de manera aleatoria los vecinos de una solución dada, realizamos lo siguiente:
-\begin{itemize}
-\item Crear una lista de números de 0 al número de características del problema
-\item Reordenar aleatoriamente dicha lista
+\item \textbf{Selección:} Dado $n$ el tamaño de la población objetivo. Se seleccionan $2n$ individuos de la población anterior aleatoriamente. Se comparan en orden --- primero con segundo, tercero con cuarto--- y devolvemos los individuos que sean mejores de cada comparación.
+\item \textbf{Operación de cruce de una pareja:} Si ambos padres tienen el mismo gen ---verdadero o falso--- sus hijos tienen ese gen. Si los padres tienen un gen distinto, aleatoriamente un hijo recibirá un valor y el otro hijo el otro.
+\item \textbf{Operación de cruce:} Dado $p$ la probabilidad de cruce. Se tomarán los primeros $2n$ padres y se cruzan con el operador de cruce de parejas en orden --primero con segundo, tercero con cuarto,...---. $n$ es el número de cruces, que se calcula como $n = \lfloor\frac{n_{padres} * p}{2}\rfloor$.
+\item \textbf{Operación de mutación:} Sea $p$ la probabilidad de mutación y $g$ el número de genes en total de la población a mutar. Entonces se deciden mutar $\lfloor p*g \rfloor$ genes. Generamos aleatoriamente que genes se van a mutar, y para cada uno de ellos, cambiamos su valor al opuesto.
 \end{itemize} 
-La lista reordenada después se recorre, y modificando el elemento indicado de la solución de partida, obtenemos los vecinos.\\
-
-Búsqueda local:
-\begin{itemize}
-\item Hasta que no encontremos mejora en el bucle interno o superemos el número máximo de iteraciones, repetir:
-\item Para cada vecino, ordenados aleatoriamente ---bucle interno---
-\begin{itemize}
-\item Calcular la función objetivo.
-\item Si mejora la función objetivo de la solución actual, pasa a ser la solución actual y termina el búcle interno.
-\end{itemize} 
-\end{itemize} 
-\newpage
 \newpage
 \section{Explicación de los algoritmos}
 
-\subsection{BMB}
-\textbf{Búsqueda multiarranque básico}
+Los algoritmos AGE y AGG se diferencian en los parámetros de probabilidad de cruce, tamaño de la población de hijos a generar y probabilidad de mutación, además de la función de reemplazamiento de la población.\\
+
+Los parámetros son los indicados en el documento de prácticas.\\
+
+Vamos a ver un esquema general del algoritmo genético, y luego las funciones de reemplazamiento de cada modelo concreto. Se usan las funciones explicadas en la sección anterior para cruce, mutación y selección.\\
+
+\subsection{Genético general}
+
 \begin{itemize}
-\item Realizar 25 veces:
+\item Generar una población inicial aleatoria, evaluarla y ordenarla. Se considera como población actual.
+\item Mientras no se supere el límite de evaluaciones:
 \begin{itemize}
-\item Calcular solución aleatoria.
-\item Realizar búsqueda local a la solución.
-\item Si es mejor que la mejor solución hasta el momento, guardarla como nueva mejor solución
+\item Seleccionar los padres de la nueva generación.
+\item Cruzar los padres.
+\item Mutar el resultado anterior. El resultado es la nueva generación.
+\item Evaluamos y ordenamos la nueva generación.
+\item Reemplazamos y ordenamos la generación actual usando la función de reemplazamiento.
 \end{itemize} 
-\item Devuelve la mejor solución encontrada y el valor de su función objetivo.
+\item Devuelve la mejor solución de la generación actual y el valor de su función objetivo.
 \end{itemize} 
 \newpage
-\subsection{GRASP}
-\textbf{ASFS:}
+\subsection{AGE}
+\textbf{Función de reemplazamiento:}
 \begin{itemize}
-\item La solución empieza completamente a falso.
-\item Mientras que encontremos mejora:
-\begin{itemize}
-\item Creamos un vector para guardar los valores de la función objetivo
-\item Inicializamos valores para guardar los máximos y mínimos encontrados.
-\item Para cada característica, si no es verdadera:
-\begin{itemize}
-\item Guardar su valor de función objetivo y posición.
-\item Actualizar el mejor y peor valor de la función objetivo si fuera necesario.
-\end{itemize}
-\item Calculamos el mínimo aceptado como $M-t(M-m)$, siendo M el máximo valor de la función objetivo, m el mínimo y t la tolerancia admitida.
-\item Tomamos los vecinos que superen el mínimo y elegimos uno aleatoriamente.
-\item Si el vecino supera a la solución anterior, se toma como siguiente solución y se marca que se ha realizado mejora.
-\end{itemize}
-\item Devuelve la solución encontrada.
+\item Comparamos las dos peores soluciones de la generación actual y las dos soluciones de la nueva generación. Devolvemos en generación actual las $n-2$ mejores soluciones de la generación actual y las 2 mejores soluciones de las comparadas antes.
 \end{itemize}
 
-\textbf{GRASP:}
+\subsection{AGG}
+\textbf{Función de reemplazamiento:}
 \begin{itemize}
-\item Realizar 25 veces:
-\begin{itemize}
-\item Calcular solución inicial con ASFS.
-\item Realizar búsqueda local a la solución.
-\item Si es mejor que la mejor solución hasta el momento, guardarla como nueva mejor solución
-\end{itemize} 
-\item Devuelve la mejor solución encontrada y el valor de su función objetivo.
-\end{itemize} 
-\newpage
-\subsection{ILS}
-\textbf{Función de mutación:}
-\begin{itemize}
-\item Tomamos $s$ elementos sin remplazamiento de los números enteros desde el 0 hasta el número de características del problema, sin contar este último.  
-\item Modificamos los valores seleccionados en la solución.
-\end{itemize} 
-
-\textbf{Iterated Local Search:}
-\begin{itemize}
-\item Realizamos la búsqueda local sobre la solución inicial.
-\item Guardamos el resultado como mejor función objetivo encontrada y mejor solución encontrada.
-\item Realizamos 24 veces:
-\begin{itemize}
-\item Muta la solución.
-\item Realiza una búsqueda local sobre la solución mutada.
-\item Si la solución encontrada por la búsqueda local mejora la mejor hasta el momento, la sustituye.
-\end{itemize} 
-\item Devuelve la mejor solución encontrada y el valor de su función objetivo.
+\item Miramos si la mejor solución de la nueva generación supera a la mejor solución de la generación actual. Si es así, la nueva generación pasará a ser la generación actual. Si no es así, cambiamos el peor valor de la nueva generación por el mejor de la generación actual, y el resultado es la nueva generación actual.
 \end{itemize} 
 
 \newpage
@@ -242,25 +196,21 @@ Para usar el programa, hay que ejecutar la orden  python3 main.py BaseDatos Heur
 \label{my-label}
 \resizebox{\textwidth}{!}{\begin{tabular}{l|l|l|l|l|l|l|l|l|l|}
 \cline{2-10}
-                            & \multicolumn{3}{l|}{Wdbc}  & \multicolumn{3}{l|}{Libras} & \multicolumn{3}{l|}{Arrhythmia} \\ \cline{2-10} 
-                            & \% train & \% red & tiempo & \% train  & \% red & tiempo & \% train   & \% red  & tiempo   \\ \hline
-\multicolumn{1}{|l|}{3-NN}  & 96.44    & 0.0    & 0.02   & 68.89     & 0.0    & 0.04   & 63.36      & 0.0     & 0.12     \\ \hline
-\multicolumn{1}{|l|}{SFS}   & 96.86    & 44.66  & 0.44   & 71.83     & 47.88  & 2.35   & 67.97      & 50.53   & 51.6     \\ \hline
-\multicolumn{1}{|l|}{BMB}   & 98.38    & 52.33  & 12.12  & 78.33     & 53.99  & 74.48  & 72.64      & 50.46   & 1156.82  \\ \hline
-\multicolumn{1}{|l|}{GRASP} & 98.41    & 72.66  & 17.67  & 80.16     & 84.7   & 73.9   & 84.09      & 93.99   & 156.52   \\ \hline
-\multicolumn{1}{|l|}{ILS}   & 98.49    & 48.33  & 10.43  & 78.88     & 55.88  & 61.07  & 74.97      & 52.08   & 980.94   \\ \hline
+                           & \multicolumn{3}{l|}{Wdbc}  & \multicolumn{3}{l|}{Libras} & \multicolumn{3}{l|}{Arrhythmia} \\ \cline{2-10} 
+                           & \% train & \% red & tiempo & \% train  & \% red & tiempo & \% train   & \% red   & tiempo  \\ \hline
+\multicolumn{1}{|l|}{3-NN} & 96.44    & 0.0    & 0.02   & 68.89     & 0.0    & 0.04   & 63.36      & 0.0      & 0.12    \\ \hline
+\multicolumn{1}{|l|}{SFS}  & 96.86    & 44.66  & 0.44   & 71.83     & 47.88  & 2.35   & 67.97      & 50.53    & 51.6    \\ \hline
+\multicolumn{1}{|l|}{AGG}  & 96.97    & 49.33  & 126.26 & 72.55     & 50.22  & 229.14 & 66.11      & 50.25    & 977.53  \\ \hline
+\multicolumn{1}{|l|}{AGE}  & 98.38    & 52.33  & 132.47 & 78.77     & 48.55  & 218.4  & 74.09      & 50.03    & 942.40  \\ \hline
 \end{tabular}}
 \end{table}
-
 Los resultados se encuentran al final del documento.\\
 
-Primero, podemos ver que los tres modelos mejoran a los algoritmos de control ---KNN y SFS---. Esto era de esperar, pues el espacio explorado es mucho más grande gracias a las reinicializaciones y a la calidad de los resultados que nos da LS, que por si mismo ya encuentra resultados cercanos a SFS.\\
+Hemos obtenido unos resultados algo sorprendentes. Por un lado, el genético generacional, pese a realizar un número muy grande de evaluaciones, se encuentra en los rangos de acierto de SFS, uno de las heurísticas de comparación. Esto nos indica que el genético no funciona muy bien en su estado actual. Más adelante se realizará una ampliación de estos modelos genéticos utilizando una búsqueda local para mejorar a la población, y realizando esto se espera un mejor comportamiento.\\
 
-Por otro lado, destacar que GRASP gana a sus competidores. El partir de una solución de calidad para después realizar LS, genera muy buenos resultados. Además, la búsqueda local casi no tiene que hacer trabajo, por la calidad de la solución inicial, siendo muy rápida su ejecución y penalizando, pero no en exceso, el tiempo de ejecución. Además, por la forma de construcción de las soluciones iniciales, consigue una gran tasa de reducción, lo que puede ser muy importante en una aplicación real. Además, tras observar los tiempos de las distintas evaluaciones, esa gran reducción hace que el tiempo sea mucho menor para la base de datos Arrhythmia.\\
+De todas maneras, vamos a analizar las diferencias entre AGG y AGE. Ambos tienen unos tiempos de ejecución parecidos, pues están limitados por el número de ejecuciones de la función de coste. Sin embargo, AGE tiene resultados bastante mejores. Esto puede deberse al comportamiento de AGE, que es más selectivo y tiene menos variabilidad de la población que AGG, haciendo que explore menos espacio en el espacio de soluciones, pero de una manera más exhaustiva. Por tanto podríamos esperar una gran mejora de AGG al ser utilizado en una metaheurística memética, y no tanta mejora en el AGE.\\
 
-Entre ILS y BMB hay pocas diferencias. ILS mejora con respecto a BMB, pero recordemos que BMB da una solución inicial aleatoria, por lo tanto cabría esperar que ILS mejorara más con respecto a BMB. Eso sí, como las soluciones que va generando ILS están relativamente cerca de un óptimo, va ligeramente más rápido que BMB. Luego podríamos decir que ILS funciona mejor que BMB, pero no por mucho.\\
-
-En resumen, el mejor método es con diferencia GRASP, seguido por ILS y BMB, en ese orden.\\
+En resumen, las heurísticas genéticas básicas no funcionan del todo bien para el problema. De tener que utilizar una, seleccionaríamos AGE, pues obtiene unas soluciones de más calidad al explotar más los óptimos.\\
 
 \newpage
 \section{Referencias}
@@ -272,7 +222,7 @@ Aparte de la documentación de la asignatura, he usado las páginas de referenci
 \item K-nn CUDA: \url{https://github.com/agarciamontoro/metaheuristics}
 \end{itemize}
 \newpage
-
+\newpage
 \begin{table}[]
 \centering
 \caption{KNN}
@@ -319,67 +269,45 @@ Aparte de la documentación de la asignatura, he usado las páginas de referenci
 
 \begin{table}[]
 \centering
-\caption{BMB}
+\caption{AGE}
 \label{my-label}
 \resizebox{\textwidth}{!}{\begin{tabular}{l|l|l|l|l|l|l|l|l|l|l|l|l|}
 \cline{2-13}
                              & \multicolumn{4}{l|}{Wdbc}            & \multicolumn{4}{l|}{Libras}          & \multicolumn{4}{l|}{Arrhythmia}       \\ \cline{2-13} 
                              & \% train & \% test & \% red & tiempo & \% train & \% test & \% red & tiempo & \% train & \% test & \% red & tiempo  \\ \hline
-\multicolumn{1}{|l|}{P 1-1}  & 98.59    & 96.49   & 50.0   & 13.21  & 76.11    & 70.56   & 53.33  & 78.12  & 73.44    & 63.4    & 51.44  & 1309.78 \\ \hline
-\multicolumn{1}{|l|}{P 1-2}  & 98.95    & 94.72   & 56.67  & 11.77  & 77.78    & 83.33   & 54.44  & 71.54  & 71.65    & 62.5    & 48.56  & 1083.94 \\ \hline
-\multicolumn{1}{|l|}{P 2-1}  & 98.24    & 95.44   & 40.0   & 12.42  & 79.44    & 68.89   & 42.22  & 75.26  & 73.44    & 68.56   & 51.08  & 1110.23 \\ \hline
-\multicolumn{1}{|l|}{P 2-2}  & 98.25    & 94.01   & 56.67  & 12.31  & 80.0     & 76.11   & 54.44  & 70.4   & 73.71    & 65.1    & 51.44  & 1087.23 \\ \hline
-\multicolumn{1}{|l|}{P 3-1}  & 98.24    & 95.44   & 63.33  & 12.66  & 83.89    & 75.56   & 57.78  & 77.93  & 72.4     & 62.89   & 46.76  & 1411.0  \\ \hline
-\multicolumn{1}{|l|}{P 3-2}  & 98.6     & 96.13   & 40.0   & 13.12  & 77.22    & 73.33   & 45.56  & 92.52  & 72.16    & 65.1    & 51.44  & 1084.71 \\ \hline
-\multicolumn{1}{|l|}{P 4-1}  & 97.54    & 93.68   & 70.0   & 13.16  & 78.33    & 69.44   & 60.0   & 66.49  & 72.92    & 68.04   & 51.08  & 1200.48 \\ \hline
-\multicolumn{1}{|l|}{P 4-2}  & 99.3     & 94.01   & 43.33  & 10.64  & 79.44    & 66.67   & 55.56  & 70.57  & 72.16    & 65.1    & 50.72  & 1069.36 \\ \hline
-\multicolumn{1}{|l|}{P 5-1}  & 97.89    & 95.09   & 50.0   & 10.22  & 75.0     & 72.78   & 64.44  & 74.05  & 71.35    & 64.43   & 51.44  & 1168.29 \\ \hline
-\multicolumn{1}{|l|}{P 5-2}  & 98.25    & 95.77   & 53.33  & 11.7   & 78.33    & 74.44   & 52.22  & 68.01  & 73.2     & 63.54   & 50.72  & 1043.26 \\ \hline
-\multicolumn{1}{|l|}{Medias} & 98.38    & 95.07   & 52.33  & 12.12  & 78.55    & 73.11   & 53.99  & 74.48  & 72.64    & 64.86   & 50.46  & 1156.82 \\ \hline
+\multicolumn{1}{|l|}{P 1-1}  & 98.59    & 95.44   & 53.33  & 117.53 & 77.78    & 66.67   & 50.0   & 193.38 & 76.56    & 64.95   & 51.08  & 973.7   \\ \hline
+\multicolumn{1}{|l|}{P 1-2}  & 98.95    & 93.66   & 40.0   & 130.46 & 75.56    & 81.11   & 51.11  & 229.99 & 72.68    & 60.42   & 51.8   & 849.44  \\ \hline
+\multicolumn{1}{|l|}{P 2-1}  & 98.59    & 93.68   & 60.0   & 138.56 & 82.22    & 68.89   & 42.22  & 225.71 & 72.4     & 63.4    & 46.04  & 1096.86 \\ \hline
+\multicolumn{1}{|l|}{P 2-2}  & 98.6     & 96.13   & 56.67  & 125.87 & 81.11    & 73.89   & 43.33  & 209.65 & 74.23    & 61.46   & 50.36  & 872.29  \\ \hline
+\multicolumn{1}{|l|}{P 3-1}  & 97.89    & 96.84   & 43.33  & 159.41 & 82.22    & 74.44   & 47.78  & 269.8  & 75.52    & 59.28   & 54.68  & 937.9   \\ \hline
+\multicolumn{1}{|l|}{P 3-2}  & 98.6     & 96.13   & 56.67  & 138.8  & 77.78    & 75.56   & 43.33  & 260.64 & 75.26    & 61.46   & 48.2   & 834.29  \\ \hline
+\multicolumn{1}{|l|}{P 4-1}  & 96.83    & 93.68   & 46.67  & 116.65 & 76.67    & 73.33   & 54.44  & 189.66 & 74.48    & 60.31   & 47.84  & 1002.45 \\ \hline
+\multicolumn{1}{|l|}{P 4-2}  & 99.3     & 92.96   & 56.67  & 158.38 & 79.44    & 71.67   & 52.22  & 193.13 & 71.13    & 66.15   & 50.36  & 879.83  \\ \hline
+\multicolumn{1}{|l|}{P 5-1}  & 97.89    & 94.39   & 50.0   & 130.12 & 75.56    & 75.56   & 57.78  & 187.17 & 72.4     & 63.92   & 52.52  & 1088.45 \\ \hline
+\multicolumn{1}{|l|}{P 5-2}  & 98.6     & 97.89   & 60.0   & 108.95 & 79.44    & 74.44   & 43.33  & 225.09 & 76.29    & 62.5    & 47.48  & 888.86  \\ \hline
+\multicolumn{1}{|l|}{Medias} & 98.38    & 95.08   & 52.33  & 132.47 & 78.77    & 73.77   & 48.55  & 218.42 & 74.09    & 62.38   & 50.03  & 942.40  \\ \hline
 \end{tabular}}
 \end{table}
 
 \begin{table}[]
 \centering
-\caption{GRASP}
-\label{my-label}
-\resizebox{\textwidth}{!}{\begin{tabular}{l|l|l|l|l|l|l|l|l|l|l|l|l|}
-\cline{2-13}
-                             & \multicolumn{4}{l|}{Wdbc}            & \multicolumn{4}{l|}{Libras}          & \multicolumn{4}{l|}{Arrhythmia}      \\ \cline{2-13} 
-                             & \% train & \% test & \% red & tiempo & \% train & \% test & \% red & tiempo & \% train & \% test & \% red & tiempo \\ \hline
-\multicolumn{1}{|l|}{P 1-1}  & 98.59    & 93.33   & 70.0   & 17.55  & 78.33    & 70.56   & 85.56  & 75.49  & 85.42    & 69.59   & 93.53  & 193.89 \\ \hline
-\multicolumn{1}{|l|}{P 1-2}  & 98.6     & 95.77   & 73.33  & 19.33  & 80.0     & 80.56   & 88.89  & 72.45  & 81.44    & 70.83   & 95.32  & 118.54 \\ \hline
-\multicolumn{1}{|l|}{P 2-1}  & 98.59    & 93.68   & 66.67  & 19.32  & 81.67    & 73.89   & 87.78  & 68.65  & 84.38    & 69.07   & 92.45  & 196.05 \\ \hline
-\multicolumn{1}{|l|}{P2-2}   & 98.25    & 94.72   & 83.33  & 18.07  & 80.56    & 70.56   & 82.22  & 75.61  & 86.08    & 69.79   & 94.24  & 131.0  \\ \hline
-\multicolumn{1}{|l|}{P 3-1}  & 98.59    & 91.93   & 70.0   & 17.51  & 84.44    & 76.11   & 82.22  & 77.61  & 80.73    & 66.49   & 93.88  & 133.76 \\ \hline
-\multicolumn{1}{|l|}{P 3-2}  & 98.25    & 96.48   & 73.33  & 17.17  & 77.78    & 73.33   & 83.33  & 78.66  & 85.57    & 71.35   & 95.68  & 165.34 \\ \hline
-\multicolumn{1}{|l|}{P 4-1}  & 97.18    & 97.54   & 70.0   & 15.73  & 78.33    & 70.56   & 82.22  & 75.14  & 82.29    & 72.16   & 91.37  & 190.58 \\ \hline
-\multicolumn{1}{|l|}{P 4-2}  & 99.3     & 94.72   & 70.0   & 16.98  & 80.0     & 66.67   & 85.56  & 77.34  & 85.05    & 77.6    & 94.6   & 140.69 \\ \hline
-\multicolumn{1}{|l|}{P 5-1}  & 98.59    & 92.28   & 70.0   & 17.13  & 78.89    & 73.89   & 85.56  & 70.15  & 86.98    & 77.84   & 94.96  & 143.29 \\ \hline
-\multicolumn{1}{|l|}{P 5-2}  & 98.25    & 96.83   & 80.0   & 17.94  & 81.67    & 73.33   & 84.44  & 67.95  & 82.99    & 71.88   & 93.88  & 152.08 \\ \hline
-\multicolumn{1}{|l|}{Medias} & 98.41    & 94.72   & 72.66  & 17.67  & 80.16    & 72.94   & 84.7   & 73.9   & 84.09    & 71.66   & 93.99  & 156.52 \\ \hline
-\end{tabular}}
-\end{table}
-
-\begin{table}[]
-\centering
-\caption{ILS}
+\caption{AGG}
 \label{my-label}
 \resizebox{\textwidth}{!}{\begin{tabular}{l|l|l|l|l|l|l|l|l|l|l|l|l|}
 \cline{2-13}
                              & \multicolumn{4}{l|}{Wdbc}            & \multicolumn{4}{l|}{Libras}          & \multicolumn{4}{l|}{Arrhythmia}       \\ \cline{2-13} 
                              & \% train & \% test & \% red & tiempo & \% train & \% test & \% red & tiempo & \% train & \% test & \% red & tiempo  \\ \hline
-\multicolumn{1}{|l|}{P 1-1}  & 98.94    & 96.14   & 50.0   & 11.28  & 76.11    & 73.89   & 57.78  & 66.95  & 78.12    & 63.92   & 53.6   & 1075.2  \\ \hline
-\multicolumn{1}{|l|}{P 1-2}  & 98.6     & 96.83   & 53.33  & 9.94   & 76.67    & 82.78   & 51.11  & 65.05  & 73.71    & 71.88   & 55.4   & 803.65  \\ \hline
-\multicolumn{1}{|l|}{P 2-1}  & 99.3     & 95.44   & 50.0   & 8.73   & 80.56    & 70.56   & 56.67  & 72.94  & 72.92    & 62.37   & 47.48  & 1061.74 \\ \hline
-\multicolumn{1}{|l|}{P 2-2}  & 98.25    & 96.13   & 53.33  & 10.35  & 79.44    & 73.89   & 60.0   & 57.12  & 74.74    & 66.67   & 55.04  & 843.96  \\ \hline
-\multicolumn{1}{|l|}{P 3-1}  & 98.24    & 95.79   & 33.33  & 13.03  & 85.0     & 73.33   & 51.11  & 65.55  & 76.56    & 64.95   & 52.88  & 1037.26 \\ \hline
-\multicolumn{1}{|l|}{P 3-2}  & 98.6     & 96.48   & 53.33  & 10.38  & 78.33    & 73.33   & 61.11  & 51.42  & 75.77    & 66.15   & 56.47  & 912.49  \\ \hline
-\multicolumn{1}{|l|}{P 4-1}  & 97.54    & 97.54   & 40.0   & 12.07  & 77.78    & 72.22   & 50.0   & 61.15  & 74.48    & 64.43   & 50.0   & 1055.89 \\ \hline
-\multicolumn{1}{|l|}{P 4-2}  & 99.3     & 95.42   & 46.67  & 8.92   & 78.33    & 68.33   & 61.11  & 51.36  & 75.77    & 67.19   & 52.88  & 909.47  \\ \hline
-\multicolumn{1}{|l|}{P 5-1}  & 97.89    & 94.04   & 50.0   & 10.36  & 77.78    & 73.89   & 55.56  & 65.19  & 71.88    & 61.86   & 44.6   & 1073.12 \\ \hline
-\multicolumn{1}{|l|}{P 5-2}  & 98.25    & 96.13   & 53.33  & 9.32   & 78.89    & 71.67   & 54.44  & 54.04  & 75.77    & 64.06   & 52.52  & 1036.64 \\ \hline
-\multicolumn{1}{|l|}{Medias} & 98.49    & 95.99   & 48.33  & 10.43  & 78.88    & 73.38   & 55.88  & 61.07  & 74.97    & 65.34   & 52.08  & 980.94  \\ \hline
+\multicolumn{1}{|l|}{P 1-1}  & 97.54    & 95.44   & 53.33  & 128.93 & 70.56    & 66.67   & 50.0   & 225.29 & 66.15    & 64.95   & 51.08  & 1058.46 \\ \hline
+\multicolumn{1}{|l|}{P 1-2}  & 96.84    & 94.37   & 40.0   & 128.68 & 70.56    & 82.78   & 46.67  & 229.64 & 65.46    & 62.5    & 48.92  & 891.37  \\ \hline
+\multicolumn{1}{|l|}{P 2-1}  & 97.18    & 93.68   & 60.0   & 130.96 & 75.0     & 68.89   & 42.22  & 238.31 & 65.62    & 63.4    & 46.04  & 1065.89 \\ \hline
+\multicolumn{1}{|l|}{P 2-2}  & 97.19    & 96.13   & 40.0   & 128.88 & 73.33    & 75.0    & 54.44  & 219.1  & 65.98    & 62.5    & 46.4   & 904.13  \\ \hline
+\multicolumn{1}{|l|}{P 3-1}  & 96.48    & 96.84   & 43.33  & 130.23 & 77.22    & 74.44   & 47.78  & 239.9  & 64.58    & 59.28   & 54.68  & 1067.36 \\ \hline
+\multicolumn{1}{|l|}{P 3-2}  & 96.84    & 96.13   & 46.67  & 134.18 & 72.22    & 76.11   & 48.89  & 242.76 & 68.56    & 64.06   & 47.84  & 915.87  \\ \hline
+\multicolumn{1}{|l|}{P 4-1}  & 95.42    & 93.68   & 46.67  & 115.59 & 71.11    & 73.33   & 54.44  & 230.0  & 66.67    & 60.31   & 47.84  & 1029.91 \\ \hline
+\multicolumn{1}{|l|}{P 4-2}  & 97.89    & 91.9    & 56.67  & 123.28 & 72.78    & 73.33   & 50.0   & 227.29 & 64.95    & 61.98   & 54.68  & 903.67  \\ \hline
+\multicolumn{1}{|l|}{P 5-1}  & 96.83    & 94.39   & 50.0   & 117.73 & 68.33    & 75.56   & 57.78  & 211.71 & 65.62    & 63.92   & 52.52  & 1042.13 \\ \hline
+\multicolumn{1}{|l|}{P 5-2}  & 97.54    & 95.77   & 56.67  & 124.14 & 74.44    & 75.0    & 50.0   & 227.49 & 67.53    & 63.02   & 52.52  & 896.55  \\ \hline
+\multicolumn{1}{|l|}{Medias} & 96.97    & 94.83   & 49.33  & 126.26 & 72.55    & 74.11   & 50.22  & 229.14 & 66.11    & 62.59   & 50.25  & 977.53  \\ \hline
 \end{tabular}}
 \end{table}
 \end{document}
