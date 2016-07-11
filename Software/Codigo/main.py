@@ -40,6 +40,12 @@ def main():
 			my_heuristic = heuristic.AGGHeuristic(None)
 		elif sys.argv[2] == "AGE":
 			my_heuristic = heuristic.AGEHeuristic(None)
+		elif sys.argv[2] == "AM1":
+			my_heuristic = heuristic.MemeticHeuristic(None,10,True)
+		elif sys.argv[2] == "AM2":
+			my_heuristic = heuristic.MemeticHeuristic(None,1,False)
+		elif sys.argv[2] == "AM3":
+			my_heuristic = heuristic.MemeticHeuristic(None,1,True)
 		else:
 			print("Opcion de heuristica incorrecta")
 			return

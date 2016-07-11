@@ -1,0 +1,28 @@
+#! /bin/bash
+
+printf "wdbc AM1\n"
+python ./main.py wdbc AM1
+
+printf "libra AM1\n"
+python ./main.py libras AM1
+
+printf "arrhythmia AM1\n"
+python ./main.py arrhythmia AM1
+
+printf "wdbc AM2\n"
+python ./main.py wdbc AM2
+
+printf "libra AM2\n"
+python ./main.py libras AM2
+
+printf "arrhythmia AM2\n"
+python ./main.py arrhythmia AM2
+
+printf "wdbc AM3\n"
+python ./main.py wdbc AM3
+
+printf "libra AM3\n"
+python ./main.py libras AM3
+
+printf "arrhythmia AM3\n"
+python ./main.py arrhythmia AM3

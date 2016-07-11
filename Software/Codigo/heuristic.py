@@ -177,7 +177,7 @@ class KNNHeuristic(Heuristic):
 	def run(self,mask,max_iter):
 		mask.set_true()
 		return self.classifier.score_train(mask)
-		
+
 class BMBHeuristic(Heuristic):
 
 	def __init__(self,classifier):
@@ -409,3 +409,77 @@ class AGGHeuristic(Heuristic):
 	def run(self,mask,max_iter):
 		GGHeuristic = GenericGeneticHeuristic(self.classifier)
 		return GGHeuristic.run(mask,max_iter,30,self.replace_gen,0.7)
+
+class MemeticHeuristic(GenericGeneticHeuristic):
+	def __init__(self,classifier,num_LS,elitism_LS):
+		super().__init__(classifier)
+		self.num_LS = num_LS
+		self.elitism_LS = elitism_LS
+
+	def replace_gen(self,current_gen,next_gen):
+		if current_gen[0].get_score() > next_gen[0].get_score():
+			next_gen[-1] = current_gen[0]
+
+	def memetic_LS(self,current_gen,num_LS,elitism_LS):
+		num_evals = 0
+
+		if elitism_LS:
+			gen_to_LS = range(num_LS)
+		else:
+			gen_to_LS = np.random.choice(range(len(current_gen)),
+										   num_LS,
+										   replace = False)
+
+		for idx_gen in gen_to_LS:
+			mask = current_gen[idx_gen]
+			best_score = mask.get_score()
+
+			for idx in random.sample(range(mask.length()),mask.length()):
+				score = self.classifier.score_train(mask, idx)
+				num_evals += 1
+				if  score > best_score:
+					mask.flip(idx)
+					mask.set_score(score)
+					break
+
+		return num_evals
+
+	def run(self,mask,max_iter,prob_cross=0.7,num_parents=10,size_population=10,prob_mutation = 0.001):
+		current_gen = self.random_population(size_population,mask.length())
+		num_evals = 0
+		gen_number = 0
+
+		for mask in current_gen:
+			num_evals += 1
+			mask.set_score(self.classifier.score_train(mask))
+
+		current_gen = sorted(current_gen, key = lambda x:x.get_score(), reverse = True)
+
+		while num_evals < max_iter:
+			gen_number += 1
+
+			print("Generación: " + str(gen_number))
+			print("Número evaluaciones: " + str(num_evals))
+
+			next_gen = self.select_parents(current_gen,num_parents)
+			self.cross(next_gen,prob_cross)
+			self.mutate(next_gen,prob_mutation)
+
+			for mask in next_gen:
+				num_evals += 1
+				mask.set_score(self.classifier.score_train(mask))
+			next_gen = sorted(next_gen, key = lambda x:x.get_score(), reverse = True)
+
+			self.replace_gen(current_gen,next_gen)
+
+			current_gen = sorted(next_gen, key = lambda x:x.get_score(), reverse = True)
+
+			if gen_number % 10 == 0:
+				print("He entrado en el LS.")
+				num_evals += self.memetic_LS(current_gen,self.num_LS,self.elitism_LS)
+				print("num_evals: " + str(num_evals))
+
+			current_gen = sorted(current_gen, key = lambda x:x.get_score(), reverse = True)
+
+		mask = current_gen[0]
+		return mask.get_score()
