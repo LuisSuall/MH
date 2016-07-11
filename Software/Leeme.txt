@@ -1,11 +1,11 @@
-Codigo:
+﻿Codigo:
 Contiene el código de las prácticas. Contiene:
 
 -main.py: Main para ejecutar la práctica.
     
     Ejecutar con python3 main.py <BD> <Heu> ¿<seed>?
         BD: base de datos (wdbc, libras, arrhythmia)
-        Heu: Heurística (SFS,LS,SA,TS)
+        Heu: Heurística (KNN,FS,LS,SA,TS,BMB,GRASP,ILS,AGG,AGE,AM1,AM2,AM3)
         seed: opcional. Si no se introduce ninguna,
              se ejecuta con las usadas en la práctica
 
@@ -15,5 +15,8 @@ Contiene el código de las prácticas. Contiene:
 -main_ejecuciones.py: main usado al ejecutar los resultados (obsoleto)
 -mask.py: Implementa una solución
 
+Codigo/Results:
+Contiene los resultados de las diferentes prácticas.
+
 Datos:
-Contiene las bases de datos usadas en la práctica
+Contiene las bases de datos usadas en la práctica.
