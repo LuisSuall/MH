@@ -441,6 +441,8 @@ class MemeticHeuristic(GenericGeneticHeuristic):
 					mask.flip(idx)
 					mask.set_score(score)
 					break
+					
+			current_gen[idx_gen] = mask
 
 		return num_evals
 
